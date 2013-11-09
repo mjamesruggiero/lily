@@ -3,13 +3,13 @@
 # k nearest neighbors
 # mjamesruggiero
 # Thu Nov  7 22:13:21 PST 2013
-from numpy import tile, array, zeros
+from numpy import tile, array, zeros, shape
 import operator
-import matplotlib
 import matplotlib.pyplot as plt
 
 import logging
-logging.basicConfig(level=logging.ERROR, format="%(lineno)d\t%(message)s")
+logging.basicConfig(level=logging.DEBUG, format="%(lineno)d\t%(message)s")
+
 
 def create_data_set():
     group = array([[1.0, 1.1], [1.0, 1.0], [0, 0], [0, 0.1]])
@@ -43,8 +43,8 @@ def classify_0(in_x, data_set, labels, k):
         class_count[vote_i_label] = class_count.get(vote_i_label, 0) + 1
 
     sorted_class_count = sorted(class_count.iteritems(),
-            key=operator.itemgetter(1),
-            reverse=True)
+                                key=operator.itemgetter(1),
+                                reverse=True)
 
     # the most frequent
     return sorted_class_count[0][0]
@@ -71,23 +71,80 @@ def file_to_matrix(filename):
     return return_matrix, class_label_vector
 
 
-def main():
-    roles = ['scatter1', 'scatter2']
-    this_role = 'scatter2'
+def auto_norm(data_set):
+    """
+    Get the minimum values of each column
+    and place in min_vals. max_vals, too.
+    data_set.min(0) allows you to take the minimums
+    from the columns, not the rows.
+    Then calculate the range of possible
+    values seen in our data.
+    To get the normalized values,
+    you subtract the minimum values
+    and then divide by the range."""
+    min_vals = data_set.min(0)
+    max_vals = data_set.max(0)
+    ranges = max_vals - min_vals
+    norm_data_set = zeros(shape(data_set))
+    m = data_set.shape[0]
+    norm_data_set = data_set - tile(min_vals, (m, 1))
+    norm_data_set = norm_data_set / tile(ranges, (m, 1))
+    return norm_data_set, ranges, min_vals
+
+
+def dating_class_test():
+    ho_ratio = 0.10
     data_file = 'data/datingTestSet2.txt'
-
-    fig = plt.figure()
     dating_data_matrix, dating_labels = file_to_matrix(data_file)
-    logging.info("the matrix is {}".format(dating_data_matrix))
-    ax = fig.add_subplot(111)
+    norm_matrix, ranges, min_vals = auto_norm(dating_data_matrix)
+    m = norm_matrix.shape[0]
+    num_test_vecs = int(m * ho_ratio)
+    error_count = 0.0
+    for i in range(num_test_vecs):
+        classifier_result = classify_0(norm_matrix[i, :],
+                                       norm_matrix[num_test_vecs:m, :],
+                                       dating_labels[num_test_vecs:m], 3)
 
-    logging.info("calling plt.show() for role '{0}'".format(this_role))
-    if this_role == roles[0]:
-        ax.scatter(dating_data_matrix[:, 1], dating_data_matrix[:,2])
-    else:
-        ax.scatter(dating_data_matrix[:, 1], dating_data_matrix[:, 2], 15.0*array(dating_labels))
+        display_result = 'P'
+        if classifier_result != dating_labels[i]:
+            error_count += 1.0
+            display_result = '**FAIL**'
 
-    plt.show()
+        message = "classifier return:\t{0}, real answer:\t{1}\t{2}".\
+                  format(classifier_result, dating_labels[i], display_result)
+        logging.info(message)
+
+    logging.info("the total error rate is {0:.2f}".
+                 format(error_count/float(num_test_vecs)))
+
+
+def main():
+    mode = 'normalized'
+    data_file = 'data/datingTestSet2.txt'
+    dating_data_matrix, dating_labels = file_to_matrix(data_file)
+
+    if 'graphing' == mode:
+        roles = ['scatter1', 'scatter2']
+        this_role = 'scatter2'
+
+        fig = plt.figure()
+        logging.info("the matrix is {}".format(dating_data_matrix))
+        ax = fig.add_subplot(111)
+
+        logging.info("calling plt.show() for role '{0}'".format(this_role))
+        if this_role == roles[0]:
+            ax.scatter(dating_data_matrix[:, 1], dating_data_matrix[:, 2])
+        else:
+            ax.scatter(dating_data_matrix[:, 1],
+                       dating_data_matrix[:, 2],
+                       15.0*array(dating_labels))
+
+        plt.show()
+
+    if 'normalized' == mode:
+        norm_matrix, ranges, min_vals = auto_norm(dating_data_matrix)
+        logging.info("norm_matrix is {}".format(norm_matrix))
 
 if __name__ == '__main__':
-    main()
+    #main()
+    dating_class_test()
