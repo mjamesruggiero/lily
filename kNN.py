@@ -6,6 +6,7 @@
 from numpy import tile, array, zeros, shape
 import operator
 import matplotlib.pyplot as plt
+import argparse
 
 import logging
 logging.basicConfig(level=logging.DEBUG, format="%(lineno)d\t%(message)s")
@@ -19,10 +20,10 @@ def create_data_set():
 
 def classify_0(in_x, data_set, labels, k):
     """For every point in our dataset
-    calculate the distance between inX and the current point
-    sort the distances in increasing order
-    take k items with lowest distances to inX
-    find the majority class among these items
+    calculate the distance between inX and the current point;
+    sort the distances in increasing order;
+    take k items with lowest distances to inX;
+    find the majority class among these items;
     return the majority class as our prediction for the class of inX"""
     data_set_size = data_set.shape[0]
 
@@ -92,9 +93,7 @@ def auto_norm(data_set):
     return norm_data_set, ranges, min_vals
 
 
-def dating_class_test():
-    ho_ratio = 0.10
-    data_file = 'data/datingTestSet2.txt'
+def dating_class_test(data_file, ho_ratio=0.10):
     dating_data_matrix, dating_labels = file_to_matrix(data_file)
     norm_matrix, ranges, min_vals = auto_norm(dating_data_matrix)
     m = norm_matrix.shape[0]
@@ -110,15 +109,22 @@ def dating_class_test():
             error_count += 1.0
             display_result = '**FAIL**'
 
-        message = "classifier return:\t{0}, real answer:\t{1}\t{2}".\
-                  format(classifier_result, dating_labels[i], display_result)
-        logging.info(message)
+        msg = "\t".join(["[{num}] classifier:",
+              "{classifier}",
+              "real answer:",
+              "{label}",
+              "{actual}"]).format(num=i,
+                                  classifier=classifier_result,
+                                  label=dating_labels[i],
+                                  actual=display_result)
+
+        logging.info(msg)
 
     logging.info("the total error rate is {0:.2f}".
                  format(error_count/float(num_test_vecs)))
 
 
-def main():
+def build_graph(data_file):
     mode = 'normalized'
     data_file = 'data/datingTestSet2.txt'
     dating_data_matrix, dating_labels = file_to_matrix(data_file)
@@ -146,5 +152,22 @@ def main():
         logging.info("norm_matrix is {}".format(norm_matrix))
 
 if __name__ == '__main__':
-    #main()
-    dating_class_test()
+    DESCRIPTION = 'A small script that does kNN'
+    parser = argparse.ArgumentParser(description=DESCRIPTION)
+
+    parser.add_argument('data_file', action="store")
+    parser.add_argument('mode', action="store")
+    parser.add_argument('ho_ratio', action="store", default=0.10, type=float)
+    parser.add_argument('-l', action="store_true", default=False)
+
+    logging.info(parser.parse_args())
+
+    results = parser.parse_args()
+    ho_ratio = results.ho_ratio
+    data_file = results.data_file
+    mode = results.mode
+
+    if mode == 'test':
+        dating_class_test(data_file, ho_ratio)
+    if mode == 'graph':
+        build_graph(data_file)
