@@ -76,6 +76,29 @@ def build_graph(data_file):
         norm_matrix, ranges, min_vals = lily.auto_norm(dating_data_matrix)
         logging.info("norm_matrix is {}".format(norm_matrix))
 
+
+def classify_person():
+    """
+    predict whether or not the features match a passing candidate
+    """
+    result_list = ['not at all', 'in small doses', 'in large doses']
+    percent_tats = float(raw_input(
+                         "percentage of time spent playing video games? "))
+    f_flier_miles = float(raw_input("frequent flier miles earned per year? "))
+    ice_cream = float(raw_input("liters of ice cream consumed per year? "))
+
+    filepath = "data/datingTestSet2.txt"
+    dating_matrix, dating_labels = lily.file_to_matrix(filepath)
+    normalized_matrix, ranges, min_vals = lily.auto_norm(dating_matrix)
+    in_arr = array([f_flier_miles, percent_tats, ice_cream])
+    classifier_result = lily.classify_0((in_arr - min_vals)/ranges,
+                                        normalized_matrix,
+                                        dating_labels,
+                                        3)
+    print("You will probably like this person: ",
+          result_list[classifier_result - 1])
+
+
 if __name__ == '__main__':
     DESCRIPTION = 'A small script that demoes kNN'
     parser = argparse.ArgumentParser(description=DESCRIPTION)
@@ -91,7 +114,7 @@ if __name__ == '__main__':
     results = parser.parse_args()
 
     l_level = logging.ERROR
-    if results.l == True:
+    if results.l:
         l_level = logging.DEBUG
 
     logging.basicConfig(level=l_level,
@@ -107,3 +130,5 @@ if __name__ == '__main__':
         dating_class_test(data_file, ho_ratio)
     if mode == 'graph':
         build_graph(data_file)
+    if mode == 'predict':
+        classify_person()
