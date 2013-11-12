@@ -24,10 +24,31 @@ class TestLily(unittest.TestCase):
 
 
     def test_shannon_entropy(self):
-        """lily - calculate_shannon_entropy returns the shannon entropy"""
+        """
+        lily - calculate_shannon_entropy returns the shannon entropy
+        """
         my_data, labels = self.create_dataset()
         se = lily.calculate_shannon_entropy(my_data)
         self.assertEqual(se, 0.9709505944546686)
+
+
+    def test_split_dataset(self):
+        """
+        lily - split_data_set breaks feature vectors on desired vals
+        """
+        my_data, labels = self.create_dataset()
+        returned = lily.split_data_set(my_data, 0, 1)
+        self.assertEqual([[1, 'yes'], [1, 'yes'], [0, 'no']], returned)
+
+
+    def test_choose_best_feature_to_split(self):
+        """
+        lily - choose_best_feature_to_split discovers best feature
+        """
+        my_data, labels = self.create_dataset()
+        returned = lily.choose_best_feature_to_split(my_data)
+        self.assertEqual(0, returned)
+
 
 if __name__ == '__main__':
     unittest.main()

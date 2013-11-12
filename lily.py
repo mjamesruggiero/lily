@@ -104,3 +104,41 @@ def calculate_shannon_entropy(data_set):
         prob = float(label_counts[key])/num_entries
         shannon_entropy -= prob * log(prob, 2)
     return shannon_entropy
+
+
+def split_data_set(data_set, axis, value):
+    """
+    Takes: dataset to split, the feature to split on,
+    and the value of the feature to return.
+    and cut out the feature to split on
+    """
+    ret_data_set = []
+    for feature_vec in data_set:
+        if feature_vec[axis] == value:
+            reduced_feature_vec = feature_vec[:axis]
+            reduced_feature_vec.extend(feature_vec[axis+1:])
+            ret_data_set.append(reduced_feature_vec)
+    return ret_data_set
+
+def choose_best_feature_to_split(data_set):
+    num_features = len(data_set[0]) - 1
+    base_entropy = calculate_shannon_entropy(data_set)
+    best_information_gain = 0.0
+    best_feature = -1
+
+    for i in range(num_features):
+        feature_list = [example[i] for example in data_set]
+        unique_values = set(feature_list)
+
+        new_entropy = 0.0
+        for value in unique_values:
+            sub_data_set = split_data_set(data_set, i, value)
+            prob = len(sub_data_set)/float(len(data_set))
+            new_entropy += prob * calculate_shannon_entropy(sub_data_set)
+
+        information_gain = base_entropy - new_entropy
+        if information_gain > best_information_gain:
+            best_information_gain = information_gain
+            best_feature = i
+
+    return best_feature
