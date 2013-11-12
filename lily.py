@@ -2,6 +2,7 @@
 
 # lily is a module for statistics functions
 from numpy import tile, zeros, shape
+from math import log
 import operator
 import logging
 
@@ -78,3 +79,28 @@ def auto_norm(data_set):
     norm_data_set = data_set - tile(min_vals, (m, 1))
     norm_data_set = norm_data_set / tile(ranges, (m, 1))
     return norm_data_set, ranges, min_vals
+
+
+def calculate_shannon_entropy(data_set):
+    """
+    calculate a cont of the number of instances;
+    create a dict whose keys are the values in the final col;
+    if a key was not encountered previously, one is created;
+    for each key, keep track of how many times the label occurs;
+    finally use the frequency of all the different labels
+    to calculate the probablility of that label;
+    then sum this up for all the labels
+    """
+    num_entries = len(data_set)
+    label_counts = {}
+    for feature_vec in data_set:
+        current_label = feature_vec[-1]
+        if current_label not in label_counts.keys():
+            label_counts[current_label] = 0
+        label_counts[current_label] += 1
+
+    shannon_entropy = 0.0
+    for key in label_counts:
+        prob = float(label_counts[key])/num_entries
+        shannon_entropy -= prob * log(prob, 2)
+    return shannon_entropy
