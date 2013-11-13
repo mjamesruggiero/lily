@@ -6,6 +6,10 @@ from math import log
 import operator
 import logging
 
+logging.basicConfig(level=logging.ERROR,
+                    format="%(filename)s, %(funcName)s, %(lineno)d %(message)s")
+
+
 def classify_0(in_x, data_set, labels, k):
     """For every point in our dataset
     calculate the distance between inX and the current point;
@@ -120,23 +124,32 @@ def split_data_set(data_set, axis, value):
             ret_data_set.append(reduced_feature_vec)
     return ret_data_set
 
+
 def choose_best_feature_to_split(data_set):
     num_features = len(data_set[0]) - 1
     base_entropy = calculate_shannon_entropy(data_set)
+    logging.info("base entropy is {0}".format(base_entropy))
     best_information_gain = 0.0
     best_feature = -1
 
     for i in range(num_features):
         feature_list = [example[i] for example in data_set]
         unique_values = set(feature_list)
+        logging.info("unique values are {0}".format(unique_values))
 
         new_entropy = 0.0
         for value in unique_values:
             sub_data_set = split_data_set(data_set, i, value)
             prob = len(sub_data_set)/float(len(data_set))
+
             new_entropy += prob * calculate_shannon_entropy(sub_data_set)
+            logging.info("value is {0}; prob is {1}; new entropy is {2}".
+                         format(value, prob, new_entropy))
 
         information_gain = base_entropy - new_entropy
+        logging.info("--> information gain for {0} is {1}".
+                     format(i, information_gain))
+
         if information_gain > best_information_gain:
             best_information_gain = information_gain
             best_feature = i
