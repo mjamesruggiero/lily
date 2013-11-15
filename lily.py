@@ -6,8 +6,8 @@ from math import log
 import operator
 import logging
 
-logging.basicConfig(level=logging.ERROR,
-                    format="%(filename)s, %(funcName)s, %(lineno)d %(message)s")
+FORMAT = "%(filename)s, %(funcName)s, %(lineno)d %(message)s"
+logging.basicConfig(level=logging.ERROR, format=FORMAT)
 
 
 def classify_0(in_x, data_set, labels, k):
@@ -155,3 +155,42 @@ def choose_best_feature_to_split(data_set):
             best_feature = i
 
     return best_feature
+
+
+def majority_count(class_list):
+    class_count = {}
+    for vote in class_list:
+        if vote not in class_count.keys():
+            class_count[vote] = 0
+        class_count[vote] += 1
+    sorted_class_count = sorted(class_count.iteritems(),
+                                key=operator.itemgetter(1),
+                                reverse=True)
+    return sorted_class_count[0][0]
+
+
+def create_tree(data_set, labels):
+    class_list = [example[-1] for example in data_set]
+
+    # stop when all classes are equal
+    if class_list.count(class_list[0]) == len(class_list):
+        return class_list[0]
+
+    # when there are no more features, return majority
+    if len(data_set[0]) == 1:
+        return majority_count(class_list)
+
+    best_feature = choose_best_feature_to_split(data_set)
+    best_feature_label = labels[best_feature]
+    my_tree = {best_feature_label: {}}
+    del(labels[best_feature])
+    feature_values = [example[best_feature] for example in data_set]
+    unique_values = set(feature_values)
+    for value in unique_values:
+        sub_labels = labels[:]
+        my_tree[best_feature_label][value] = \
+            create_tree(split_data_set(data_set,
+                                       best_feature,
+                                       value), sub_labels)
+
+    return my_tree
