@@ -3,9 +3,10 @@
 # k nearest neighbors
 # mjamesruggiero
 # Thu Nov  7 22:13:21 PST 2013
-from numpy import array
+from numpy import array, zeros
 import matplotlib.pyplot as plt
 import argparse
+import os
 import lily
 
 import logging
@@ -99,6 +100,7 @@ def classify_person():
           result_list[classifier_result - 1])
 
 
+
 if __name__ == '__main__':
     DESCRIPTION = 'A small script that demoes kNN'
     parser = argparse.ArgumentParser(description=DESCRIPTION)
@@ -117,8 +119,8 @@ if __name__ == '__main__':
     if results.l:
         l_level = logging.DEBUG
 
-    logging.basicConfig(level=l_level,
-                        format="%(filename)s, %(lineno)d %(message)s")
+    FORMAT = "%(filename)s, %(lineno)d %(message)s"
+    logging.basicConfig(level=l_level, format=FORMAT)
 
     logging.info(parser.parse_args())
 
