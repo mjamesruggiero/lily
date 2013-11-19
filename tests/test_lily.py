@@ -1,5 +1,6 @@
 import unittest
 from context import lily
+from lily import core
 import numpy as np
 
 
@@ -10,7 +11,7 @@ class TestLily(unittest.TestCase):
         """
         large_shape = np.array([[1.0, 1.1], [1.0, 1.0], [0, 0], [0, 0.1]])
         labels = ['foo', 'bar', 'bz', 'quux']
-        result = lily.classify_0(large_shape[1, :],
+        result = core.classify_0(large_shape[1, :],
                                  large_shape[2, :],
                                  labels, 2)
         assert result == 'foo'
@@ -30,7 +31,7 @@ class TestLily(unittest.TestCase):
         lily - calculate_shannon_entropy returns the shannon entropy
         """
         my_data, labels = self.create_dataset()
-        se = lily.calculate_shannon_entropy(my_data)
+        se = core.calculate_shannon_entropy(my_data)
         self.assertEqual(se, 0.9709505944546686)
 
     def test_split_dataset(self):
@@ -38,7 +39,7 @@ class TestLily(unittest.TestCase):
         lily - split_data_set breaks feature vectors on desired vals
         """
         my_data, labels = self.create_dataset()
-        returned = lily.split_data_set(my_data, 0, 1)
+        returned = core.split_data_set(my_data, 0, 1)
         self.assertEqual([[1, 'yes'], [1, 'yes'], [0, 'no']], returned)
 
     def test_choose_best_feature_to_split(self):
@@ -46,7 +47,7 @@ class TestLily(unittest.TestCase):
         lily - choose_best_feature_to_split discovers best feature
         """
         my_data, labels = self.create_dataset()
-        returned = lily.choose_best_feature_to_split(my_data)
+        returned = core.choose_best_feature_to_split(my_data)
         self.assertEqual(0, returned)
 
     def load_bayes_data_set(self):
@@ -77,7 +78,7 @@ class TestLily(unittest.TestCase):
                     'to', 'i', 'maybe', 'please',
                     'dog', 'how', 'stupid', 'so',
                     'take', 'mr', 'steak', 'my']
-        self.assertEqual(expected, lily.create_vocabulary_list(list_of_posts))
+        self.assertEqual(expected, core.create_vocabulary_list(list_of_posts))
 
     def test_set_of_words_to_vector(self):
         """lily - set_of_words_to_vector turns words into bit vector"""
@@ -85,37 +86,37 @@ class TestLily(unittest.TestCase):
                       'ape', 'gorilla', 'lump', 'chimpanzee']
         input_set = set({'hey', 'dude', 'chimpanzee'})
         self.assertEqual([0, 1, 0, 0, 0, 0, 1],
-                         lily.set_of_words_to_vector(vocabulary, input_set))
+                         core.set_of_words_to_vector(vocabulary, input_set))
 
     def test_naive_bayes(self):
         """
         lily - naive bayes can classify text based upon trained vocabulary
         """
         list_of_posts, list_classes = self.load_bayes_data_set()
-        vocabulary = lily.create_vocabulary_list(list_of_posts)
+        vocabulary = core.create_vocabulary_list(list_of_posts)
         training_matrix = []
         for post in list_of_posts:
-            vector = lily.set_of_words_to_vector(vocabulary, post)
+            vector = core.set_of_words_to_vector(vocabulary, post)
             training_matrix.append(vector)
 
         p_0_vector, p_1_vector, p_any_being_abusive = \
-            lily.train_naive_bayes0(np.array(training_matrix),
+            core.train_naive_bayes0(np.array(training_matrix),
                                     np.array(list_classes))
 
         test_entry = ['love', 'my', 'dalmation']
 
-        vector = lily.set_of_words_to_vector(vocabulary, test_entry)
+        vector = core.set_of_words_to_vector(vocabulary, test_entry)
         this_document = np.array(vector)
-        result = lily.classify_naive_bayes(this_document,
+        result = core.classify_naive_bayes(this_document,
                                            p_0_vector,
                                            p_1_vector,
                                            p_any_being_abusive)
         self.assertEqual(0, result)
 
         test_entry = ['stupid', 'garbage']
-        vector = lily.set_of_words_to_vector(vocabulary, test_entry)
+        vector = core.set_of_words_to_vector(vocabulary, test_entry)
         this_document = np.array(vector)
-        result = lily.classify_naive_bayes(this_document,
+        result = core.classify_naive_bayes(this_document,
                                            p_0_vector,
                                            p_1_vector,
                                            p_any_being_abusive)
