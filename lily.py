@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 
 # lily is a module for statistics functions
-from numpy import tile, zeros, shape
-from math import log
+from numpy import tile, zeros, ones, log, shape
 import operator
-import logging
+import math
 
+import logging
 FORMAT = "%(filename)s, %(funcName)s, %(lineno)d %(message)s"
 logging.basicConfig(level=logging.ERROR, format=FORMAT)
 
@@ -106,7 +106,7 @@ def calculate_shannon_entropy(data_set):
     shannon_entropy = 0.0
     for key in label_counts:
         prob = float(label_counts[key])/num_entries
-        shannon_entropy -= prob * log(prob, 2)
+        shannon_entropy -= prob * math.log(prob, 2)
     return shannon_entropy
 
 
@@ -194,3 +194,61 @@ def create_tree(data_set, labels):
                                        value), sub_labels)
 
     return my_tree
+
+
+def train_naive_bayes0(train_matrix, train_category):
+    """
+    * train_matrix: array of array of strings
+    * train_category: array of 0 or 1;
+    corresponding to the "class" of each
+    array of strings in train matrix
+    """
+    num_training_docs = len(train_matrix)
+    num_words = len(train_matrix[0])
+
+    #initialize probablilities; 0 or 1
+    prob_1 = sum(train_category)/float(num_training_docs)
+    p0_num = ones(num_words)
+    p1_num = ones(num_words)
+    p0_denom = 2.0
+    p1_denom = 2.0
+
+    for i in range(num_training_docs):
+        if train_category[i] == 1:
+            p1_num += train_matrix[i]
+            p1_denom += sum(train_matrix[i])
+        else:
+            p0_num += train_matrix[i]
+            p0_denom += sum(train_matrix[i])
+
+    # change to log() to help with underflow
+    p1_vector = log(p1_num/p1_denom)
+    p0_vector = log(p0_num/p0_denom)
+    return p0_vector, p1_vector, prob_1
+
+
+def classify_naive_bayes(vector_to_classify, p_0_vec, p_1_vec, p_class_1):
+    """Using element-wise multiplication"""
+    p1 = sum(vector_to_classify * p_1_vec) + log(p_class_1)
+    p0 = sum(vector_to_classify * p_0_vec) + log(1.0 - p_class_1)
+    if p1 > p0:
+        return 1
+    else:
+        return 0
+
+
+def create_vocabulary_list(data_set):
+    vocabulary_set = set([])
+    for document in data_set:
+        vocabulary_set = vocabulary_set | set(document)
+    return list(vocabulary_set)
+
+
+def set_of_words_to_vector(vocabulary_list, input_set):
+    return_vec = [0]*len(vocabulary_list)
+    for word in input_set:
+        if word in vocabulary_list:
+            return_vec[vocabulary_list.index(word)] = 1
+        else:
+            logging.warn("word '{0}' is not in known vocabulary!".format(word))
+    return return_vec
