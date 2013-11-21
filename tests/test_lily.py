@@ -16,40 +16,6 @@ class TestLily(unittest.TestCase):
                                  labels, 2)
         assert result == 'foo'
 
-    def create_dataset(self):
-        """sample data for shannon entropy test"""
-        data_set = [[1, 1, 'yes'],
-                    [1, 1, 'yes'],
-                    [1, 0, 'no'],
-                    [0, 1, 'no'],
-                    [0, 1, 'no']]
-        labels = ['no surfacing', 'flippers']
-        return data_set, labels
-
-    def test_shannon_entropy(self):
-        """
-        core - calculate_shannon_entropy returns the shannon entropy
-        """
-        my_data, labels = self.create_dataset()
-        se = core.calculate_shannon_entropy(my_data)
-        self.assertEqual(se, 0.9709505944546686)
-
-    def test_split_dataset(self):
-        """
-        core - split_data_set breaks feature vectors on desired vals
-        """
-        my_data, labels = self.create_dataset()
-        returned = core.split_data_set(my_data, 0, 1)
-        self.assertEqual([[1, 'yes'], [1, 'yes'], [0, 'no']], returned)
-
-    def test_choose_best_feature_to_split(self):
-        """
-        core - choose_best_feature_to_split discovers best feature
-        """
-        my_data, labels = self.create_dataset()
-        returned = core.choose_best_feature_to_split(my_data)
-        self.assertEqual(0, returned)
-
     def load_bayes_data_set(self):
         posting_list = [['my', 'dog', 'has', 'flea',
                          'problems', 'help', 'please'],
