@@ -27,7 +27,9 @@ def classify(input_tree, feature_labels, test_vector):
 
 
 def create_dataset():
-    """sample data for shannon entropy test"""
+    """
+    sample data for shannon entropy test
+    """
     data_set = [[1, 1, 'yes'],
                 [1, 1, 'yes'],
                 [1, 0, 'no'],
