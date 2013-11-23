@@ -6,7 +6,7 @@ from numpy import array
 import re
 
 import logging
-logging.basicConfig(level=logging.DEBUG, format="%(lineno)d\t%(message)s")
+logging.basicConfig(level=logging.ERROR, format="%(lineno)d\t%(message)s")
 
 class TestTestBayes(unittest.TestCase):
 
