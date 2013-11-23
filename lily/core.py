@@ -47,16 +47,11 @@ def file_to_matrix(filename):
     return_matrix = zeros((number_of_lines, 3))
     class_label_vector = []
 
-    index = 0
-    for line in all_lines:
+    for i, line in enumerate(all_lines):
         line = line.strip()
         list_from_line = line.split('\t')
-        logging.info("list is {0}".format(list_from_line))
         return_matrix[index, :] = list_from_line[0:3]
-        logging.info("index is {0}".format(index))
-
         class_label_vector.append(int(list_from_line[-1]))
-        index += 1
     return return_matrix, class_label_vector
 
 
