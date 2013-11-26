@@ -2,8 +2,18 @@
 from numpy import tile, zeros, ones, log, shape
 import operator
 import logging
+import re
+
 FORMAT = "%(filename)s, %(funcName)s, %(lineno)d %(message)s"
-logging.basicConfig(level=logging.ERROR, format=FORMAT)
+logging.basicConfig(level=logging.DEBUG, format=FORMAT)
+
+
+def text_parse(big_string):
+    """
+    This could be generalized further.
+    """
+    list_of_tokens = re.split(r'\W*', big_string)
+    return [tok.lower() for tok in list_of_tokens if len(tok) > 2]
 
 
 def classify_0(in_x, data_set, labels, k):
@@ -50,7 +60,7 @@ def file_to_matrix(filename):
     for i, line in enumerate(all_lines):
         line = line.strip()
         list_from_line = line.split('\t')
-        return_matrix[index, :] = list_from_line[0:3]
+        return_matrix[i, :] = list_from_line[0:3]
         class_label_vector.append(int(list_from_line[-1]))
     return return_matrix, class_label_vector
 
@@ -120,15 +130,59 @@ def classify_naive_bayes(vector_to_classify, p_0_vec, p_1_vec, p_class_1):
 def create_vocabulary_list(data_set):
     vocabulary_set = set([])
     for document in data_set:
-        vocabulary_set = vocabulary_set | set(document)
+        try:
+            vocabulary_set = vocabulary_set | set(document)
+        except TypeError, e:
+            print("error {0} with document {0}".format(e, document))
     return list(vocabulary_set)
 
 
-def set_of_words_to_vector(vocabulary_list, input_set):
+def bag_of_words_to_vector(vocabulary_list, input_set):
     return_vec = [0]*len(vocabulary_list)
     for word in input_set:
         if word in vocabulary_list:
-            return_vec[vocabulary_list.index(word)] = 1
-        else:
-            logging.warn("word '{0}' is not in known vocabulary!".format(word))
+            return_vec[vocabulary_list.index(word)] += 1
     return return_vec
+
+
+def calculate_most_frequent(vocabulary, full_text):
+    """calculate the frequency of occurrence"""
+    frequency_dict = {}
+
+    for token in vocabulary:
+        frequency_dict[token] = full_text.count(token)
+
+    sorted_frequency = sorted(frequency_dict.iteritems(),
+                              key=operator.itemgetter(1),
+                              reverse=True)
+    return sorted_frequency[:30]
+
+
+def save_to_csv(itera, filepath, headers=None):
+    """
+    itera: list of lists or list of tuples
+    filepath: a... filepath
+    """
+    import csv
+    with open(filepath, 'wb') as csvfile:
+        _writer = csv.writer(csvfile,
+                             delimiter=',',
+                             quoting=csv.QUOTE_MINIMAL)
+        if headers:
+            _writer.writerow(headers)
+        for row in itera:
+            _writer.writerow(row)
+
+
+def get_stopwords(stopwords_file):
+    fr = open(stopwords_file)
+    all_lines = fr.readlines()
+    stopwords = []
+
+    for i, line in enumerate(all_lines):
+        stopwords.append(line.strip())
+    return set(stopwords)
+
+
+def is_stopword(word, stopwords):
+    return word in stopwords
