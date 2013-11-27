@@ -127,7 +127,7 @@ def classify_naive_bayes(vector_to_classify, p_0_vec, p_1_vec, p_class_1):
         return 0
 
 
-def create_vocabulary_list(data_set):
+def create_vocabulary(data_set):
     vocabulary_set = set([])
     for document in data_set:
         try:

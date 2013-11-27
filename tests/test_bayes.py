@@ -30,7 +30,7 @@ class TestBayes(unittest.TestCase):
             doc_list.append(word_list)
             full_text.extend(word_list)
             class_list.append(0)
-        vocabulary = core.create_vocabulary_list(doc_list)
+        vocabulary = core.create_vocabulary(doc_list)
         training_set = range(50)
 
         test_set = []

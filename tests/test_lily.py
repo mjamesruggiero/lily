@@ -39,8 +39,8 @@ class TestLily(unittest.TestCase):
         class_vector = [0, 1, 0, 1, 0, 1]
         return posting_list, class_vector
 
-    def test_create_vocabulary_list(self):
-        """core - create_vocabulary_list creates... you know"""
+    def test_create_vocabulary(self):
+        """core - create_vocabulary creates... you know"""
         list_of_posts, list_classes = self.load_bayes_data_set()
         expected = ['cute', 'love', 'help', 'garbage',
                     'quit', 'food', 'problems', 'is',
@@ -50,7 +50,7 @@ class TestLily(unittest.TestCase):
                     'to', 'i', 'maybe', 'please',
                     'dog', 'how', 'stupid', 'so',
                     'take', 'mr', 'steak', 'my']
-        self.assertEqual(expected, core.create_vocabulary_list(list_of_posts))
+        self.assertEqual(expected, core.create_vocabulary(list_of_posts))
 
     def test_bag_of_words_to_vector(self):
         """core - bag_of_words_to_vector turns words into bit vector"""
@@ -65,7 +65,7 @@ class TestLily(unittest.TestCase):
         core - naive bayes can classify text based upon trained vocabulary
         """
         list_of_posts, list_classes = self.load_bayes_data_set()
-        vocabulary = core.create_vocabulary_list(list_of_posts)
+        vocabulary = core.create_vocabulary(list_of_posts)
         training_matrix = []
         for post in list_of_posts:
             vector = core.bag_of_words_to_vector(vocabulary, post)
@@ -114,13 +114,12 @@ class TestLily(unittest.TestCase):
         result = core.is_stopword('alligator', stopwords)
         self.assertFalse(result)
 
-
     def test_calculate_most_frequent(self):
         """
         core - calculate_most_frequent gets top n frequents
         """
         list_of_posts, list_classes = self.load_bayes_data_set()
-        vocabulary = core.create_vocabulary_list(list_of_posts)
+        vocabulary = core.create_vocabulary(list_of_posts)
 
         fr = open(self.fake_text)
         full_text = core.text_parse(" ".join(fr.readlines()))
