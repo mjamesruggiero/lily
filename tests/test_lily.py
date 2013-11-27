@@ -9,6 +9,7 @@ class TestLily(unittest.TestCase):
     def setUp(self):
         root_path = os.path.abspath(os.path.join(os.curdir, os.pardir))
         self.stopwords_file = "{0}/data/stopwords.txt".format(root_path)
+        self.fake_text = "{0}/data/test_text.txt".format(root_path)
 
     def test_classify_0(self):
         """
@@ -112,6 +113,24 @@ class TestLily(unittest.TestCase):
         stopwords = core.get_stopwords(self.stopwords_file)
         result = core.is_stopword('alligator', stopwords)
         self.assertFalse(result)
+
+
+    def test_calculate_most_frequent(self):
+        """
+        core - calculate_most_frequent gets top n frequents
+        """
+        list_of_posts, list_classes = self.load_bayes_data_set()
+        vocabulary = core.create_vocabulary_list(list_of_posts)
+
+        fr = open(self.fake_text)
+        full_text = core.text_parse(" ".join(fr.readlines()))
+
+        result = core.calculate_most_frequent(vocabulary, full_text, 5)
+
+        expected = [('him', 3), ('dog', 3), ('stupid', 3),
+                    ('stop', 2), ('worthless', 2)]
+        self.assertEqual(expected, result)
+
 
 if __name__ == '__main__':
     unittest.main()

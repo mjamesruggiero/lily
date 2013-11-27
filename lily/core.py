@@ -145,7 +145,7 @@ def bag_of_words_to_vector(vocabulary_list, input_set):
     return return_vec
 
 
-def calculate_most_frequent(vocabulary, full_text):
+def calculate_most_frequent(vocabulary, full_text, limit=30):
     """calculate the frequency of occurrence"""
     frequency_dict = {}
 
@@ -155,7 +155,7 @@ def calculate_most_frequent(vocabulary, full_text):
     sorted_frequency = sorted(frequency_dict.iteritems(),
                               key=operator.itemgetter(1),
                               reverse=True)
-    return sorted_frequency[:30]
+    return sorted_frequency[:limit]
 
 
 def save_to_csv(itera, filepath, headers=None):
