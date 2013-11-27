@@ -9,7 +9,7 @@ import logging
 logging.basicConfig(level=logging.ERROR, format="%(lineno)d\t%(message)s")
 
 
-class TestTestBayes(unittest.TestCase):
+class TestBayes(unittest.TestCase):
 
     def _bayes_trial(self):
         doc_list = []
