@@ -104,8 +104,8 @@ def get_top_words(feed_0, feed_1, file_0, file_1):
 def main():
     sf = feedparser.parse('http://sfbay.craigslist.org/eng/index.rss')
     ny = feedparser.parse('http://newyork.craigslist.org/eng/index.rss')
-    sf_file = '/Users/michaelruggiero/Desktop/sf_top_words.csv'
-    ny_file = '/Users/michaelruggiero/Desktop/ny_top_words.csv'
+    sf_file = '/tmp/sf_top_words.csv'
+    ny_file = '/tmp/ny_top_words.csv'
 
     #vocabList, pSF, pNY = local_words(ny, sf)
     get_top_words(sf, ny, sf_file, ny_file)
