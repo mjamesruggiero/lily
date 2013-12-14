@@ -2,7 +2,6 @@
 import os
 from numpy import mat, shape, ones, exp, arange, array, random
 
-
 def sigmoid(in_x):
     """
     sigmoid: a bounded differentiable real function
