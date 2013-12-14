@@ -2,23 +2,6 @@
 import os
 from numpy import mat, shape, ones, exp, arange, array, random
 
-def load_dataset():
-    """
-    TODO file access methods should be extracted
-    to utility class
-    """
-    data_matrix = []
-    label_matrix = []
-
-    root_path = os.path.abspath(os.curdir)
-    file_path = "{0}/data/test_set.txt".format(root_path)
-    fr = open(file_path)
-    for line in fr.readlines():
-        line_array = line.strip().split()
-        data_matrix.append([1.0, float(line_array[0]), float(line_array[1])])
-        label_matrix.append(int(line_array[2]))
-    return data_matrix, label_matrix
-
 
 def sigmoid(in_x):
     """
@@ -48,41 +31,6 @@ def gradient_ascent(data_matrix_in, class_labels):
         error = (label_matrix - h)
         weights = weights + alpha * data_matrix.transpose() * error
     return weights
-
-
-def plot_best_fit(weights):
-    """
-    Graph this
-    TODO graph methods should be extracted
-    to utility class
-    """
-
-    import matplotlib.pyplot as plt
-    #weights = wei.getA()
-    data_matrix, label_matrix = load_dataset()
-    data_array = array(data_matrix)
-    n = shape(data_array)[0]
-    x_coord_1 = []
-    y_coord_1 = []
-    x_coord_2 = []
-    y_coord_2 = []
-    for i in range(n):
-        if int(label_matrix[i]) == 1:
-            x_coord_1.append(data_array[i, 1])
-            y_coord_1.append(data_array[i, 2])
-        else:
-            x_coord_2.append(data_array[i, 1])
-            y_coord_2.append(data_array[i, 2])
-    figure = plt.figure()
-    ax = figure.add_subplot(111)
-    ax.scatter(x_coord_1, y_coord_1, s=30, c='red', marker='s')
-    ax.scatter(x_coord_2, y_coord_2, s=30, c='green')
-    x = arange(-3.0, 3.0, 0.1)
-    y = (-weights[0] - weights[1] * x)/weights[2]
-    ax.plot(x, y)
-    plt.xlabel('X1')
-    plt.ylabel('X2')
-    plt.show()
 
 
 def stochastic_gradient_ascent(data_matrix, class_labels):
