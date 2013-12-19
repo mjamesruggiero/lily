@@ -6,10 +6,10 @@ lily
 Includes
 * k-means
 * naive Bayes
-
-Will include
 * decision trees
 * logistic regression
+
+Will include
 * support vector machines
 * AdaBoost
 
