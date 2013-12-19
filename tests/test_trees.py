@@ -10,8 +10,7 @@ logging.basicConfig(level=logging.ERROR, format="%(lineno)d\t%(message)s")
 class TestTrees(unittest.TestCase):
 
     def setUp(self):
-        root_path = os.path.abspath(os.path.join(os.curdir, os.pardir))
-        data_file = os.path.join(root_path, 'data', 'lenses.txt')
+        data_file = os.path.join('data', 'lenses.txt')
         fr = open(data_file)
         self.lenses = [inst.strip().split('\t') for inst in fr.readlines()]
         self.lenses_labels = ['age', 'prescript', 'astigmatic', 'tearRate']

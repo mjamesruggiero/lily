@@ -2,14 +2,12 @@ import unittest
 from context import lily
 from lily import core
 import numpy as np
-import os
 
 
 class TestLily(unittest.TestCase):
     def setUp(self):
-        root_path = os.path.abspath(os.path.join(os.curdir, os.pardir))
-        self.stopwords_file = "{0}/data/stopwords.txt".format(root_path)
-        self.fake_text = "{0}/data/test_text.txt".format(root_path)
+        self.stopwords_file = "data/stopwords.txt"
+        self.fake_text = "data/test_text.txt"
 
     def test_classify_0(self):
         """

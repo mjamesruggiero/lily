@@ -7,9 +7,9 @@ import random
 import logging
 from numpy import array
 
+
 def stopwords_file():
-    root_path = os.path.abspath(os.path.join(os.curdir, os.pardir))
-    return "{0}/data/stopwords.txt".format(root_path)
+    return "data/stopwords.txt"
 
 
 def filter_stopwords(vocabulary, stopwords_file):
@@ -17,8 +17,10 @@ def filter_stopwords(vocabulary, stopwords_file):
     remove stopwords from vocabulary
     """
     stopwords = core.get_stopwords(stopwords_file)
-    vocabulary = [token for token in vocabulary if not core.is_stopword(token, stopwords)]
+    vocabulary = [token for token in vocabulary
+                  if not core.is_stopword(token, stopwords)]
     return vocabulary
+
 
 def local_words(feed_1, feed_0):
     """
@@ -45,7 +47,8 @@ def local_words(feed_1, feed_0):
 
     # filter out stopwords
     stopwords = core.get_stopwords(stopwords_file())
-    vocabulary = [token for token in vocabulary if not core.is_stopword(token, stopwords)]
+    vocabulary = [token for token in vocabulary
+                  if not core.is_stopword(token, stopwords)]
 
     top_thirty_words = core.calculate_most_frequent(vocabulary, full_text)
     for pair_w in top_thirty_words:

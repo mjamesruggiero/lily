@@ -2,7 +2,6 @@ import unittest
 from context import lily
 from lily import core
 import random
-import os
 from numpy import array
 
 import logging
@@ -16,16 +15,14 @@ class TestBayes(unittest.TestCase):
         class_list = []
         full_text = []
 
-        root_path = os.path.abspath(os.path.join(os.curdir, os.pardir))
-
         for i in range(1, 26):
-            filepath = "{0}/data/spam/{1}.txt".format(root_path, i)
+            filepath = "data/spam/{0}.txt".format(i)
             word_list = core.text_parse(open(filepath).read())
             doc_list.append(word_list)
             full_text.extend(word_list)
             class_list.append(1)
 
-            filepath = "{0}/data/ham/{1}.txt".format(root_path, i)
+            filepath = "data/ham/{0}.txt".format(i)
             word_list = core.text_parse(open(filepath).read())
             doc_list.append(word_list)
             full_text.extend(word_list)

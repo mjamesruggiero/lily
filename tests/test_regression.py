@@ -1,7 +1,6 @@
 import unittest
 from context import lily
 from lily import regression, utils
-import os
 from numpy import array
 
 import logging
@@ -11,8 +10,7 @@ logging.basicConfig(level=logging.ERROR, format="%(lineno)d\t%(message)s")
 class TestRegression(unittest.TestCase):
 
     def setUp(self):
-        root_path = os.path.abspath(os.path.join(os.curdir, os.pardir))
-        self.test_file = "{0}/data/test_set.txt".format(root_path)
+        self.test_file = "data/test_set.txt"
 
     def test_gradient_ascent(self):
         """

@@ -10,7 +10,7 @@ def main():
     Example graph for stochastic gradient ascent
     """
     root_path = os.path.abspath(os.curdir)
-    file_path = "{0}/data/test_set.txt".format(root_path)
+    file_path = "data/test_set.txt"
     data_matrix, label_matrix = utils.load_dataset(file_path)
     weights = regression.modified_stochastic_gradient_ascent(array(data_matrix), label_matrix)
     graphs.plot_best_fit(weights, data_matrix, label_matrix)
