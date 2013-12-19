@@ -1,2 +1,2 @@
-#python kNN.py data/datingTestSet2.txt test 0.10 -l
-python kNN.py data/datingTestSet2.txt test 0.10 
+cd examples
+python kNN.py data/datingTestSet2.txt test 0.10

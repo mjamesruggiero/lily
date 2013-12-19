@@ -7,10 +7,11 @@ from numpy import array, zeros
 import matplotlib.pyplot as plt
 import argparse
 import os
-import lily
-
 import logging
+import sys
 
+sys.path.insert(0, os.path.abspath('..'))
+from lily import core
 
 def create_data_set():
     group = array([[1.0, 1.1], [1.0, 1.0], [0, 0], [0, 0.1]])
@@ -19,13 +20,13 @@ def create_data_set():
 
 
 def dating_class_test(data_file, ho_ratio=0.10):
-    dating_data_matrix, dating_labels = lily.file_to_matrix(data_file)
-    norm_matrix, ranges, min_vals = lily.auto_norm(dating_data_matrix)
+    dating_data_matrix, dating_labels = core.file_to_matrix(data_file)
+    norm_matrix, ranges, min_vals = core.auto_norm(dating_data_matrix)
     m = norm_matrix.shape[0]
     num_test_vecs = int(m * ho_ratio)
     error_count = 0.0
     for i in range(num_test_vecs):
-        classifier_result = lily.classify_0(norm_matrix[i, :],
+        classifier_result = core.classify_0(norm_matrix[i, :],
                                             norm_matrix[num_test_vecs:m, :],
                                             dating_labels[num_test_vecs:m],
                                             3)
@@ -52,8 +53,7 @@ def dating_class_test(data_file, ho_ratio=0.10):
 
 def build_graph(data_file):
     mode = 'normalized'
-    data_file = 'data/datingTestSet2.txt'
-    dating_data_matrix, dating_labels = lily.file_to_matrix(data_file)
+    dating_data_matrix, dating_labels = core.file_to_matrix(data_file)
 
     if 'graphing' == mode:
         roles = ['scatter1', 'scatter2']
@@ -74,11 +74,11 @@ def build_graph(data_file):
         plt.show()
 
     if 'normalized' == mode:
-        norm_matrix, ranges, min_vals = lily.auto_norm(dating_data_matrix)
+        norm_matrix, ranges, min_vals = core.auto_norm(dating_data_matrix)
         logging.info("norm_matrix is {}".format(norm_matrix))
 
 
-def classify_person():
+def classify_person(filepath):
     """
     predict whether or not the features match a passing candidate
     """
@@ -88,11 +88,10 @@ def classify_person():
     f_flier_miles = float(raw_input("frequent flier miles earned per year? "))
     ice_cream = float(raw_input("liters of ice cream consumed per year? "))
 
-    filepath = "data/datingTestSet2.txt"
-    dating_matrix, dating_labels = lily.file_to_matrix(filepath)
-    normalized_matrix, ranges, min_vals = lily.auto_norm(dating_matrix)
+    dating_matrix, dating_labels = core.file_to_matrix(filepath)
+    normalized_matrix, ranges, min_vals = core.auto_norm(dating_matrix)
     in_arr = array([f_flier_miles, percent_tats, ice_cream])
-    classifier_result = lily.classify_0((in_arr - min_vals)/ranges,
+    classifier_result = core.classify_0((in_arr - min_vals)/ranges,
                                         normalized_matrix,
                                         dating_labels,
                                         3)
@@ -133,4 +132,4 @@ if __name__ == '__main__':
     if mode == 'graph':
         build_graph(data_file)
     if mode == 'predict':
-        classify_person()
+        classify_person(data_file)
