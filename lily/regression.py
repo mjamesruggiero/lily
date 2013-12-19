@@ -66,7 +66,6 @@ def modified_stochastic_gradient_ascent(data_matrix,
             # the alpha decreases with iteration,
             # but never reaches zero because of the constant
             alpha = 4/(1.0 + i + j) + _CONSTANT
-
             # update vectors chosen randomly
             rand_index = int(random.uniform(0, len(data_index)))
             h = sigmoid(sum(data_matrix[rand_index] * weights))
