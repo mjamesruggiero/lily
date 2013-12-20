@@ -74,3 +74,16 @@ def modified_stochastic_gradient_ascent(data_matrix,
             del(data_index[rand_index])
 
     return weights
+
+
+def classify_vector(in_x, weights):
+    """
+    takes weights and an input vector
+    and calculates the sigmoid;
+    more than 0.5 are 1, otherwise zero
+    """
+    probability = sigmoid(sum(in_x * weights))
+    if probability > 0.5:
+        return 1.0
+    else:
+        return 0.0
