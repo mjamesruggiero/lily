@@ -104,17 +104,25 @@ def get_top_words(feed_0, feed_1, file_0, file_1):
     core.save_to_csv(sorted_1, file_1)
 
 
-def main():
+def craigslist_example():
     sf = feedparser.parse('http://sfbay.craigslist.org/eng/index.rss')
     ny = feedparser.parse('http://newyork.craigslist.org/eng/index.rss')
     sf_file = '/tmp/sf_top_words.csv'
     ny_file = '/tmp/ny_top_words.csv'
 
-    #vocabList, pSF, pNY = local_words(ny, sf)
     get_top_words(sf, ny, sf_file, ny_file)
+
+
+def tech_blog_example():
+    mashable = feedparser.parse('http://feeds.mashable.com/Mashable')
+    tech_crunch = feedparser.parse('http://feeds.feedburner.com/TechCrunch/')
+    mashable_file = '/tmp/mashable_top_words.csv'
+    tech_crunch_file = '/tmp/tech_crunch_top_words.csv'
+
+    get_top_words(mashable, tech_crunch, mashable_file, tech_crunch_file)
 
 if __name__ == '__main__':
     FORMAT = "%(lineno)d %(message)s"
     logging.basicConfig(level=logging.DEBUG, format=FORMAT)
 
-    main()
+    tech_blog_example()
