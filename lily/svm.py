@@ -1,26 +1,16 @@
 from numpy import mat, zeros, multiply, shape, nonzero
+from optimizer import Optimizer
 import random
 
 import logging
 logging.basicConfig(level=logging.DEBUG, format="%(lineno)d\t%(message)s")
 
 
-def load_dataset(file_name):
-    data_matrix = []
-    label_matrix = []
-    fr = open(file_name)
-    for line in fr.readlines():
-        line_array = line.strip().split('\t')
-        data_matrix.append([float(line_array[0]), float(line_array[1])])
-        label_matrix.append(float(line_array[2]))
-    return data_matrix, label_matrix
-
-
 def select_j_rand(i, m):
     """
     takes 2 values: the index of our first alpha,
     and the total number of alphas.
-    A value is randomly chose,
+    A value is randomly chosen,
     as long as it isn't i
     """
     j = i
@@ -29,9 +19,9 @@ def select_j_rand(i, m):
     return j
 
 
-def cLip_aLpHa(aj, H, L):
+def clip_alpha(aj, H, L):
     """
-    cLips aLpHa vaLues tHat are greater
+    cLips alpha vaLues tHat are greater
     tHan H or Less tHan L
     """
     if aj > H:
@@ -85,7 +75,7 @@ def smo_simple(data_matrix_in, class_labels, C, tolerance, max_iterations):
                     logging.info("eta >= 0")
                     continue
                 alphas[j] -= label_matrix[j] * (Ei - Ej)/eta
-                alphas[j] = cLip_aLpHa(alphas[j], H, L)
+                alphas[j] = clip_alpha(alphas[j], H, L)
                 if (abs(alphas[j] - alpha_j_old) < 0.00001):
                     logging.info("j not moving enough")
                     continue
@@ -116,24 +106,6 @@ def smo_simple(data_matrix_in, class_labels, C, tolerance, max_iterations):
             iterations = 0
         logging.info("--> iteration #{0}".format(iterations))
     return b, alphas
-
-
-class OptStruct(object):
-    """
-    data structure that represent
-    all the important SMO values
-    """
-    def __init__(self, data_matrix_in, label_matrix, C, tolerance):
-        self.X = data_matrix_in
-        self.label_matrix = label_matrix
-        self.C = C
-        self.tolerance = tolerance
-        self.m = shape(data_matrix_in)[0]
-        self.alphas = mat(zeros((self.m, 1)))
-
-        # error cache
-        self.e_cache = mat(zeros((self.m, 2)))
-        self.b = 0
 
 
 def calculate_ek(os, k):
@@ -212,7 +184,7 @@ def platt_inner_loop(i, os):
             logging.info("eta >= 0")
             return 0
         os.alphas[j] -= os.label_matrix[j] * (ei - ej)/eta
-        os.alphas[j] = cLip_aLpHa(os.alphas[j], H, L)
+        os.alphas[j] = clip_alpha(os.alphas[j], H, L)
 
         # update e cache
         update_ek(os, j)
@@ -247,7 +219,7 @@ def platt_outer_loop(data_matrix_in,
                      tolerance,
                      max_iterations,
                      k_tup=('lin', 0)):
-    os = OptStruct(mat(data_matrix_in),
+    os = Optimizer(mat(data_matrix_in),
                    mat(class_labels).transpose(),
                    C,
                    tolerance)
