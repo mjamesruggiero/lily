@@ -34,9 +34,9 @@ class TestSvm(unittest.TestCase):
             self.data_matrix.append([float(line[0]), float(line[1])])
             self.label_matrix.append(float(line[2]))
         self.os = optimizer.Optimizer(mat(self.data_matrix),
-                                 mat(self.label_matrix).transpose(),
-                                 self.C,
-                                 self.tolerance)
+                                      mat(self.label_matrix).transpose(),
+                                      self.C,
+                                      self.tolerance)
 
     def test_calculate_ek(self):
         """svm - calculate_ek calculates E value for a given alpha"""
@@ -71,7 +71,7 @@ class TestSvm(unittest.TestCase):
         """
         self.assertFalse(svm.needs_optimization(self.os, 5, 0.1))
 
-    def test_needs_optimization_returns_false_for_high_ei(self):
+    def test_needs_optimization_returns_true_for_neg_ei(self):
         """
         svm - needs_optimization returns true for small neg ei
         """
