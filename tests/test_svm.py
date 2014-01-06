@@ -4,7 +4,7 @@ from lily import svm, optimizer
 from numpy import mat
 
 import logging
-logging.basicConfig(level=logging.INFO, format="%(lineno)d\t%(message)s")
+logging.basicConfig(level=logging.WARNING, format="%(lineno)d\t%(message)s")
 
 
 class TestSvm(unittest.TestCase):
@@ -33,15 +33,15 @@ class TestSvm(unittest.TestCase):
         for line in self.test_data:
             self.data_matrix.append([float(line[0]), float(line[1])])
             self.label_matrix.append(float(line[2]))
-
-    def test_calculate_ek(self):
-        """svm - calculate_ek calculates E value for a given alpha"""
-        os = optimizer.Optimizer(mat(self.data_matrix),
+        self.os = optimizer.Optimizer(mat(self.data_matrix),
                                  mat(self.label_matrix).transpose(),
                                  self.C,
                                  self.tolerance)
+
+    def test_calculate_ek(self):
+        """svm - calculate_ek calculates E value for a given alpha"""
         for k in range(len(self.test_data)):
-            ek = svm.calculate_ek(os, k)
+            ek = svm.calculate_ek(self.os, k)
 
         self.assertEqual(ek, -1.0)
 
@@ -64,6 +64,18 @@ class TestSvm(unittest.TestCase):
         i = 4
         m = 76
         self.assertNotEqual(svm.select_j_rand(i, m), i)
+
+    def test_needs_optimization_returns_false_for_low_ei(self):
+        """
+        svm - needs_optimization returns false for small nonneg ei
+        """
+        self.assertFalse(svm.needs_optimization(self.os, 5, 0.1))
+
+    def test_needs_optimization_returns_false_for_high_ei(self):
+        """
+        svm - needs_optimization returns true for small neg ei
+        """
+        self.assertTrue(svm.needs_optimization(self.os, 5, -5.1))
 
 if __name__ == '__main__':
     unittest.main()

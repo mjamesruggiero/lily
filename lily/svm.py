@@ -3,7 +3,7 @@ from optimizer import Optimizer
 import random
 
 import logging
-logging.basicConfig(level=logging.DEBUG, format="%(lineno)d\t%(message)s")
+logging.basicConfig(level=logging.WARNING, format="%(funcName)s\t%(message)s")
 
 
 def select_j_rand(i, m):
@@ -160,11 +160,25 @@ def update_ek(os, k):
     os.e_cache[k] = [1, ek]
 
 
+def needs_optimization(os, i, ei):
+    """
+    isolating conditional as function
+    """
+    label_ei_product_less_neg_tol = os.label_matrix[i] * ei < -os.tolerance
+    alpha_at_i_less_than_C = os.alphas[i] < os.C
+    too_small = label_ei_product_less_neg_tol and alpha_at_i_less_than_C
+
+    label_ie_product_greater_than_tol = os.label_matrix[i] * ei > os.tolerance
+    alpha_at_i_greater_than_zero = os.alphas[i] > 0
+    too_large = label_ie_product_greater_than_tol \
+        and alpha_at_i_greater_than_zero
+
+    return too_small or too_large
+
+
 def platt_inner_loop(i, os):
     ei = calculate_ek(os, i)
-    if ((os.label_matrix[i] * ei < -os.tolerance)
-            and (os.alphas[i] < os.C)) or\
-            ((os.label_matrix[i] * ei > os.tolerance) and (os.alphas[i] > 0)):
+    if needs_optimization(os, i, ei):
         j, ej = select_j(i, os, ei)
         alpha_i_old = os.alphas[i].copy()
         alpha_j_old = os.alphas[j].copy()
