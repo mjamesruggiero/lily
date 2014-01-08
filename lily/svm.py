@@ -262,3 +262,18 @@ def platt_outer_loop(data_matrix_in,
             entire_set = True
         logging.info("iteration number: {0}".format(iteration))
     return os.b, os.alphas
+
+def calculate_ws(alphas, data_array, class_labels):
+    """
+    get the hpyerplane from the alphas
+    by computing the w values.
+    note that if the alphas are zero, they don't
+    "matter" which is the "support" part of the machine
+    """
+    X = mat(data_array)
+    label_matrix = mat(class_labels).transpose()
+    m, n = shape(X)
+    w = zeros((n, 1))
+    for i in range(m):
+        w += multiply(alphas[i] * label_matrix[i], X[i, :].T)
+    return w
