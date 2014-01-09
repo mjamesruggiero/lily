@@ -33,10 +33,12 @@ class TestOptimizer(unittest.TestCase):
         for line in self.test_data:
             self.data_matrix.append([float(line[0]), float(line[1])])
             self.label_matrix.append(float(line[2]))
+        kernel = ('lin', 1.3)
         self.os = optimizer.Optimizer(mat(self.data_matrix),
                                       mat(self.label_matrix).transpose(),
                                       self.C,
-                                      self.tolerance)
+                                      self.tolerance,
+                                      kernel)
 
     def test_optimizer(self):
         """

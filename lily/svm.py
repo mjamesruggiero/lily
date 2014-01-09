@@ -113,8 +113,7 @@ def calculate_ek(os, k):
     calculates an E value for
     a given alpha
     """
-    f_x_k = float(multiply(os.alphas, os.label_matrix).T *
-                  (os.X * os.X[k, :].T)) + os.b
+    f_x_k = float(multiply(os.alphas, os.label_matrix).T * os.K[:, k] + os.b)
     ek = f_x_k - float(os.label_matrix[k])
     return ek
 
@@ -192,8 +191,7 @@ def platt_inner_loop(i, os):
         if L == H:
             logging.info("L == H")
             return 0
-        eta = 2.0 * os.X[i, :] * os.X[j, :].T - os.X[i, :] *\
-            os.X[i, :].T - os.X[j, :] * os.X[j, :].T
+        eta = 2.0 * os.K[i, j] - os.K[i, i] - os.K[j, j]
         if eta >= 0:
             logging.info("eta >= 0")
             return 0
@@ -211,11 +209,11 @@ def platt_inner_loop(i, os):
         # update e cache
         update_ek(os, i)
         b1 = os.b - ei - os.label_matrix[i] * (os.alphas[i] - alpha_i_old) *\
-            os.X[i, :] * os.X[i, :].T - os.label_matrix[j] *\
-            (os.alphas[j] - alpha_j_old) * os.X[j, :] * os.X[j, :].T
+            os.K[i, i] - os.label_matrix[j] * (os.alphas[j] - alpha_j_old) *\
+            os.K[i, j]
         b2 = os.b - ej - os.label_matrix[i] * (os.alphas[i] - alpha_i_old) *\
-            os.X[i, :] * os.X[j, :].T - os.label_matrix[j] *\
-            (os.alphas[j] - alpha_j_old) * os.X[j, :] * os.X[j, :].T
+            os.K[i, j] - os.label_matrix[j] * (os.alphas[j] - alpha_j_old) *\
+            os.K[j, j]
         if (0 < os.alphas[i]) and (os.C > os.alphas[j]):
             os.b = b1
         elif (0 < os.alphas[j]) and (os.C > os.alphas[j]):
@@ -232,29 +230,34 @@ def platt_outer_loop(data_matrix_in,
                      C,
                      tolerance,
                      max_iterations,
-                     k_tup=('lin', 0)):
+                     k_tuple=('lin', 0)):
     os = Optimizer(mat(data_matrix_in),
                    mat(class_labels).transpose(),
                    C,
-                   tolerance)
+                   tolerance, k_tuple)
     iteration = 0
     entire_set = True
     alpha_pairs_changed = 0
+
     while (iteration < max_iterations)\
             and ((alpha_pairs_changed > 0) or (entire_set)):
         alpha_pairs_changed = 0
         if entire_set:
             for i in range(os.m):
                 alpha_pairs_changed += platt_inner_loop(i, os)
+
             message = "full set, iter: {0}, i: {1}, pairs_changed: {2}"
             logging.info(message.format(iteration, i, alpha_pairs_changed))
+
             iteration += 1
         else:
             non_bound_is = nonzero((os.alphas.A > 0) * (os.alphas.A < C))[0]
             for i in non_bound_is:
                 alpha_pairs_changed += platt_inner_loop(i, os)
+
                 message = "nonbound, iter: {0} i: {1}, pairs changed: {2}"
                 logging.info(message.format(iteration, i, alpha_pairs_changed))
+
                 iteration += 1
         if entire_set:
             entire_set = False
@@ -263,12 +266,13 @@ def platt_outer_loop(data_matrix_in,
         logging.info("iteration number: {0}".format(iteration))
     return os.b, os.alphas
 
+
 def calculate_ws(alphas, data_array, class_labels):
     """
     get the hpyerplane from the alphas
-    by computing the w values.
+    by computing the w value.
     note that if the alphas are zero, they don't
-    "matter" which is the "support" part of the machine
+    "matter"
     """
     X = mat(data_array)
     label_matrix = mat(class_labels).transpose()
