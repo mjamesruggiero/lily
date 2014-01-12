@@ -20,8 +20,10 @@ def kernel_transform(X, A, k_tuple):
 
 class Optimizer(object):
     """
-    data structure that represents
-    all the important SMO values
+    Data structure that represents
+    SMO values.
+    Called an 'optimizer' because it makes
+    optimizing the algorithm easier
     """
     def __init__(self, data_matrix_in, label_matrix, C, tolerance, k_tuple):
         self.X = data_matrix_in
@@ -37,5 +39,6 @@ class Optimizer(object):
 
         #kernel
         self.K = mat(zeros((self.m, self.m)))
+
         for i in range(self.m):
             self.K[:, i] = kernel_transform(self.X, self.X[i, :], k_tuple)

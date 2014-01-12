@@ -5,6 +5,26 @@ import random
 import logging
 logging.basicConfig(level=logging.WARNING, format="%(funcName)s\t%(message)s")
 
+"""
+Sequential Minimal Optimization
+
+Breaks large optimzation problems into smaller problems.
+The smaller problems can easily be solved, and solving them sequentially
+will give the same answer as trying to solve everything together.
+
+SMO works to find a set of alphas and b.
+Once we have a set of alphas, we can easily compute our weights w
+and get the separating hyperplane.
+
+SMO chooses two alphas to optimize on each cycle.
+Once a suitable pair of alphas is found, one is increased
+and one is decreased. To be suitable, a set of alphas must
+meet certain criteria.
+
+One: both of the alphas have to be outside their margin boundary.
+Two: the alphas aren't already clamped or bounded.
+"""
+
 
 def select_j_rand(i, m):
     """
@@ -29,83 +49,6 @@ def clip_alpha(aj, H, L):
     if L > aj:
         aj = L
     return aj
-
-
-def smo_simple(data_matrix_in, class_labels, C, tolerance, max_iterations):
-    data_matrix = mat(data_matrix_in)
-    label_matrix = mat(class_labels).transpose()
-    b = 0
-    m, n = shape(data_matrix)
-    alphas = mat(zeros((m, 1)))
-    iterations = 0
-    while(iterations < max_iterations):
-        alpha_pairs_changed = 0
-        for i in range(m):
-            f_x_i = float(multiply(alphas, label_matrix).T *
-                          (data_matrix * data_matrix[i, :].T)) + b
-            Ei = f_x_i - float(label_matrix[i])
-
-            logging.info("Ei: {0}, alphas[i]: {1}".format(Ei, alphas[i]))
-            can_alphas_change_test_1 = ((label_matrix[i] * Ei < -tolerance)
-                                        and (alphas[i] < C))
-            can_alphas_change_test_2 = ((label_matrix[i] * Ei > tolerance)
-                                        and (alphas[i] > 0))
-
-            if can_alphas_change_test_1 or can_alphas_change_test_2:
-                j = select_j_rand(i, m)
-                f_x_j = float(multiply(alphas, label_matrix).T *
-                              (data_matrix * data_matrix[j, :].T)) + b
-                Ej = f_x_j - float(label_matrix[j])
-                alpha_i_old = alphas[i].copy()
-                alpha_j_old = alphas[j].copy()
-                if label_matrix[i] != label_matrix[j]:
-                    L = max(0, alphas[j] - alphas[i])
-                    H = min(C, C + alphas[j] - alphas[i])
-                else:
-                    L = max(0, alphas[j] + alphas[i] - C)
-                    H = min(C, alphas[j] - alphas[i])
-                if L == H:
-                    logging.info("L == H")
-                    continue
-                eta = 2.0 * data_matrix[i, :] *\
-                    data_matrix[j, :].T - data_matrix[i, :] *\
-                    data_matrix[i, :].T - data_matrix[j, :] *\
-                    data_matrix[j, :].T
-                if eta >= 0:
-                    logging.info("eta >= 0")
-                    continue
-                alphas[j] -= label_matrix[j] * (Ei - Ej)/eta
-                alphas[j] = clip_alpha(alphas[j], H, L)
-                if (abs(alphas[j] - alpha_j_old) < 0.00001):
-                    logging.info("j not moving enough")
-                    continue
-                alphas[i] += label_matrix[j] * label_matrix[i] *\
-                    (alpha_j_old - alphas[j])
-                b1 = b - Ei - label_matrix[i] * (alphas[i] - alpha_i_old) *\
-                    data_matrix[i, :] *\
-                    data_matrix[i, :].T - label_matrix[j] *\
-                    (alphas[j] - alpha_j_old) *\
-                    data_matrix[j, :] * data_matrix[j, :].T
-                b2 = b - Ej - label_matrix[i] *\
-                    (alphas[i] - alpha_i_old) *\
-                    data_matrix[i, :] *\
-                    data_matrix[j, :].T - label_matrix[j] *\
-                    (alphas[j] - alpha_j_old) * data_matrix[j, :] *\
-                    data_matrix[j, :].T
-
-                if (0 < alphas[i]) and (C > alphas[i]):
-                    b = b1
-                elif (0 < alphas[j]) and (C > alphas[j]):
-                    b = b2
-                else:
-                    b = (b1 + b2)/2.0
-                alpha_pairs_changed += 1
-        if alpha_pairs_changed == 0:
-            iterations += 1
-        else:
-            iterations = 0
-        logging.info("--> iteration #{0}".format(iterations))
-    return b, alphas
 
 
 def calculate_ek(os, k):
@@ -189,7 +132,8 @@ def platt_inner_loop(i, os):
             L = max(0, os.alphas[j] + os.alphas[i] - os.C)
             H = min(os.C, os.alphas[j] + os.alphas[i])
         if L == H:
-            logging.info("L == H")
+            message = "L == H; i = {i_val}, ei = {ei}".format(i_val=i, ei=ei)
+            logging.info(message)
             return 0
         eta = 2.0 * os.K[i, j] - os.K[i, i] - os.K[j, j]
         if eta >= 0:
