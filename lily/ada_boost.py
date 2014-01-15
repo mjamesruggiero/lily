@@ -4,16 +4,6 @@ import logging
 logging.basicConfig(level=logging.INFO, format="%(funcName)s\t%(message)s")
 
 
-def load_simple_data():
-    data_matrix = np.matrix([[1., 2.1],
-                             [2., 1.1],
-                             [1.3, 1.],
-                             [1., 1.],
-                             [2., 1.]])
-    class_labels = [1.0, 1.0, -1.0, -1.0, 1.0]
-    return data_matrix, class_labels
-
-
 def stump_classify(data_matrix, dimension, threshold, threshold_ineq):
     """
     performs threshold comparisons
@@ -76,7 +66,7 @@ def build_stump(data_array, class_labels, D):
     return best_stump, min_error, best_class_estimate
 
 
-def ada_boost_train_dataset(data_array, class_labels, iterations=40):
+def train_dataset(data_array, class_labels, iterations=40):
     weak_classifications = []
     m = np.shape(data_array)[0]
     D = np.mat(np.ones((m, 1)) / m)
@@ -96,38 +86,26 @@ def ada_boost_train_dataset(data_array, class_labels, iterations=40):
                                class_estimate)
         D = np.multiply(D, np.exp(exponent))
         D = D / D.sum()
-        aggregated_class_estimates += alpha * class_estimate
 
+        aggregated_class_estimates += alpha * class_estimate
         message = "aggregated_class_estimates: {agg}".\
             format(agg=aggregated_class_estimates.T)
         logging.info(message)
 
-        agg_errors = np.multiply(np.sign(aggregated_class_estimates)
-                                 != np.mat(class_labels).T, np.ones((m, 1)))
-        error_rate = agg_errors.sum() / m
+        error_rate = aggregated_error_rate(aggregated_class_estimates,
+                                           class_labels,
+                                           m)
         logging.info("total error: {err}".format(err=error_rate))
         if error_rate == 0.0:
             break
     return weak_classifications
 
 
+def aggregated_error_rate(estimates, class_labels, m):
+    agg_errors = np.multiply(np.sign(estimates) != np.mat(class_labels).T,
+                             np.ones((m, 1)))
+    return agg_errors.sum() / m
+
+
 def get_alpha(error):
     return float(0.5 * np.log((1.0 - error) / max(error, 1e-16)))
-
-
-def main():
-    D = np.mat(np.ones((5, 1)) / 5)
-    data_matrix, class_labels = load_simple_data()
-    stump, min_error, best_estimate = build_stump(data_matrix,
-                                                  class_labels,
-                                                  D)
-    logging.info('stump: {}'.format(stump))
-    logging.info('min_error: {}'.format(min_error))
-    logging.info('best_estimate: {}'.format(best_estimate))
-    classifier_array = ada_boost_train_dataset(data_matrix, class_labels, 9)
-    for c in classifier_array:
-        logging.info('classifier: {c}'.format(c=c))
-
-
-if __name__ == '__main__':
-    main()
