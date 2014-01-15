@@ -5,13 +5,11 @@ logging.basicConfig(level=logging.INFO, format="%(funcName)s\t%(message)s")
 
 
 def load_simple_data():
-    data_matrix = np.matrix([
-        [1., 2.1],
-        [2., 1.1],
-        [1.3, 1.],
-        [1., 1.],
-        [2., 1.]
-        ])
+    data_matrix = np.matrix([[1., 2.1],
+                             [2., 1.1],
+                             [1.3, 1.],
+                             [1., 1.],
+                             [2., 1.]])
     class_labels = [1.0, 1.0, -1.0, -1.0, 1.0]
     return data_matrix, class_labels
 
@@ -48,7 +46,7 @@ def build_stump(data_array, class_labels, D):
     for i in range(n):
         range_min = data_matrix[:, i].min()
         range_max = data_matrix[:, i].max()
-        step_size = (range_max - range_min)/number_of_steps
+        step_size = (range_max - range_min) / number_of_steps
         for j in range(-1, int(number_of_steps) + 1):
             for inequal in ['lt', 'gt']:
                 threshold = (range_min + float(j) * step_size)
@@ -60,12 +58,10 @@ def build_stump(data_array, class_labels, D):
                 _errors[predicted_values == label_matrix] = 0
                 weighted_error = D.T * _errors
 
-                message = ', '.join([
-                    'split: dim {}',
-                    'thresh {:03.2f}',
-                    'inequal: {}',
-                    'weighted_error: {}'
-                    ])
+                message = ', '.join(['split: dim {}',
+                                     'thresh {:03.2f}',
+                                     'inequal: {}',
+                                     'weighted_error: {}'])
                 logging.info(message.format(i,
                                             threshold,
                                             inequal,
@@ -83,25 +79,29 @@ def build_stump(data_array, class_labels, D):
 def ada_boost_train_dataset(data_array, class_labels, iterations=40):
     weak_classifications = []
     m = np.shape(data_array)[0]
-    D = np.mat(np.ones((m, 1))/m)
+    D = np.mat(np.ones((m, 1)) / m)
     aggregated_class_estimates = np.mat(np.zeros((m, 1)))
+
     for i in range(iterations):
         best_stump, error, class_estimate = build_stump(data_array,
                                                         class_labels,
                                                         D)
         logging.info("D is {}".format(D.T))
-        alpha = float(0.5 * np.log((1.0 - error)/max(error, 1e-16)))
+        alpha = get_alpha(error)
         best_stump['alpha'] = alpha
         weak_classifications.append(best_stump)
+
         logging.info("class estimate: {est}".format(est=class_estimate.T))
         exponent = np.multiply(-1 * alpha * np.mat(class_labels).T,
                                class_estimate)
         D = np.multiply(D, np.exp(exponent))
-        D = D/D.sum()
+        D = D / D.sum()
         aggregated_class_estimates += alpha * class_estimate
+
         message = "aggregated_class_estimates: {agg}".\
             format(agg=aggregated_class_estimates.T)
         logging.info(message)
+
         agg_errors = np.multiply(np.sign(aggregated_class_estimates)
                                  != np.mat(class_labels).T, np.ones((m, 1)))
         error_rate = agg_errors.sum() / m
@@ -111,8 +111,12 @@ def ada_boost_train_dataset(data_array, class_labels, iterations=40):
     return weak_classifications
 
 
+def get_alpha(error):
+    return float(0.5 * np.log((1.0 - error) / max(error, 1e-16)))
+
+
 def main():
-    D = np.mat(np.ones((5, 1))/5)
+    D = np.mat(np.ones((5, 1)) / 5)
     data_matrix, class_labels = load_simple_data()
     stump, min_error, best_estimate = build_stump(data_matrix,
                                                   class_labels,
