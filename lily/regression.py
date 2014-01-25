@@ -1,6 +1,6 @@
 # logistic regression and stochastic gradient descent
-import os
-from numpy import mat, shape, ones, exp, arange, array, random
+from numpy import mat, shape, ones, exp, random
+
 
 def sigmoid(in_x):
     """
@@ -8,7 +8,7 @@ def sigmoid(in_x):
     that is defined for all real input values
     and has a positive derivative at each point
     """
-    return 1.0/(1 + exp(-in_x))
+    return 1.0 / (1 + exp(-in_x))
 
 
 def gradient_ascent(data_matrix_in, class_labels):
@@ -65,7 +65,7 @@ def modified_stochastic_gradient_ascent(data_matrix,
         for i in range(m):
             # the alpha decreases with iteration,
             # but never reaches zero because of the constant
-            alpha = 4/(1.0 + i + j) + _CONSTANT
+            alpha = 4 / (1.0 + i + j) + _CONSTANT
             # update vectors chosen randomly
             rand_index = int(random.uniform(0, len(data_index)))
             h = sigmoid(sum(data_matrix[rand_index] * weights))
