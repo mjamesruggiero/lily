@@ -22,8 +22,8 @@ def load_simple_data():
 
 def main():
     #test_classification()
-    test_horse_colic()
-    #test_compute_horse_auc()
+    #test_horse_colic()
+    test_compute_horse_auc()
 
 
 def test_classification():
