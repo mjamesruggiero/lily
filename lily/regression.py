@@ -1,5 +1,8 @@
 # logistic regression and stochastic gradient descent
-from numpy import mat, shape, ones, exp, random
+import numpy as np
+
+import logging
+logging.basicConfig(level=logging.INFO, format="%(funcName)s\t%(message)s")
 
 
 def sigmoid(in_x):
@@ -8,7 +11,7 @@ def sigmoid(in_x):
     that is defined for all real input values
     and has a positive derivative at each point
     """
-    return 1.0 / (1 + exp(-in_x))
+    return 1.0 / (1 + np.exp(-in_x))
 
 
 def gradient_ascent(data_matrix_in, class_labels):
@@ -19,12 +22,12 @@ def gradient_ascent(data_matrix_in, class_labels):
         update the weights by alpha * gradient
     return the weights vector
     """
-    data_matrix = mat(data_matrix_in)
-    label_matrix = mat(class_labels).transpose()
-    m, n = shape(data_matrix)
+    data_matrix = np.mat(data_matrix_in)
+    label_matrix = np.mat(class_labels).transpose()
+    m, n = np.shape(data_matrix)
     alpha = 0.001
     max_cycles = 500
-    weights = ones((n, 1))
+    weights = np.ones((n, 1))
     for k in range(max_cycles):
         h = sigmoid(data_matrix * weights)
         error = (label_matrix - h)
@@ -40,9 +43,9 @@ def stochastic_gradient_ascent(data_matrix, class_labels):
         update the weights vector by alpha * gradient
     return the weights vector
     """
-    m, n = shape(data_matrix)
+    m, n = np.shape(data_matrix)
     alpha = 0.01
-    weights = ones(n)
+    weights = np.ones(n)
     for i in range(m):
         h = sigmoid(sum(data_matrix[i] * weights))
         error = class_labels[i] - h
@@ -57,8 +60,8 @@ def modified_stochastic_gradient_ascent(data_matrix,
     The alpha changes with each iteration.
     Note that update vectors are randomly selected.
     """
-    m, n = shape(data_matrix)
-    weights = ones(n)
+    m, n = np.shape(data_matrix)
+    weights = np.ones(n)
     _CONSTANT = 0.0001
     for j in range(iterations):
         data_index = range(m)
@@ -67,7 +70,7 @@ def modified_stochastic_gradient_ascent(data_matrix,
             # but never reaches zero because of the constant
             alpha = 4 / (1.0 + i + j) + _CONSTANT
             # update vectors chosen randomly
-            rand_index = int(random.uniform(0, len(data_index)))
+            rand_index = int(np.random.uniform(0, len(data_index)))
             h = sigmoid(sum(data_matrix[rand_index] * weights))
             error = class_labels[rand_index] - h
             weights = weights + alpha * error * data_matrix[rand_index]
@@ -87,3 +90,46 @@ def classify_vector(in_x, weights):
         return 1.0
     else:
         return 0.0
+
+
+def standard_regression(x_arr, y_arr):
+    """
+    compute the best fit line.
+    first compute X.T * X and test if its
+    determinate is zero. If so, you cannot
+    get the inverse. If not, compute the w
+    values and return
+    """
+    x_matrix = np.mat(x_arr)
+    y_matrix = np.mat(y_arr).T
+    xTx = x_matrix.T * x_matrix
+    if np.linalg.det(xTx) == 0.0:
+        logging.warning("Matrix is singular, cannot do inverse")
+        return
+    ws = xTx.I * (x_matrix.T * y_matrix)
+    return ws
+
+
+def locally_weighted_linear_regression(test_point, x_arr, y_arr, k=1.0):
+    x_matrix = np.mat(x_arr)
+    y_matrix = np.mat(y_arr).T
+    m = np.shape(x_matrix)[0]
+    weights = np.mat(np.eye((m)))
+    for j in range(m):
+        diff_mat = test_point - x_matrix[j, :]
+        # populate the weights with exponentially decaying values
+        weights[j, j] = np.exp(diff_mat * diff_mat.T / (-2.0 * k ** 2))
+    x_t_x = x_matrix.T * (weights * x_matrix)
+    if np.linalg.det(x_t_x) == 0.0:
+        logging.warning("This matrix is singular, cannot do inverse")
+        return
+    ws = x_t_x.I * (x_matrix.T * (weights * y_matrix))
+    return test_point * ws
+
+
+def rss_error(y_arr, y_hat_arr):
+    """
+    returns a single number
+    describing the error of our estimate
+    """
+    return ((y_arr - y_hat_arr) ** 2).sum()
