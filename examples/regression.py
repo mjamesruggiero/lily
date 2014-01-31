@@ -96,7 +96,11 @@ def main():
     y_hat = np.mat(ab_x[100:199]) * ws
     simple_linear_regression_err = regression.rss_error(ab_y[100:199],
                                                         y_hat.T.A)
-    logging.info("error for linear regression = {}".format(simple_linear_regression_err))
+    logging.info("error for linear regression = {}".
+                 format(simple_linear_regression_err))
+
+    ridge_weights = regression.run_ridge_regression(ab_x, ab_y)
+    logging.info("ridge_weights = {0}".format(ridge_weights))
 
 if __name__ == '__main__':
     main()

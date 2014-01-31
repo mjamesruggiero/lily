@@ -1,4 +1,7 @@
-# logistic regression and stochastic gradient descent
+# logistic regression
+# stochastic gradient descent
+# standard linear regression
+# locally weighted linear regression
 import numpy as np
 
 import logging
@@ -133,3 +136,38 @@ def rss_error(y_arr, y_hat_arr):
     describing the error of our estimate
     """
     return ((y_arr - y_hat_arr) ** 2).sum()
+
+
+def ridge_regression(x_matrix, y_matrix, lamb=0.2):
+    """
+    Ridge regression adds an additional matrix
+    lambda-if-I to the matrix X^tX. The matrix I
+    is a mxm identity matrix where there are 1s in the diagonal
+    elements and zeros everywhere else.
+    """
+    x_t_x = x_matrix.T * x_matrix
+    denominator = x_t_x * np.eye(np.shape(x_matrix)[1]) * lamb
+    if np.linalg.det(denominator) == 0.0:
+        logging.warning("The matrix is singular, cannot do inverse")
+        return
+    ws = denominator.I * (x_matrix.T * y_matrix)
+    return ws
+
+
+def run_ridge_regression(x_arr, y_arr):
+    """
+    run ridge regression ofver a number of lambda values
+    """
+    x_matrix = np.mat(x_arr)
+    y_matrix = np.mat(y_arr).T
+    y_mean = np.mean(y_matrix, 0)
+    y_matrix = y_matrix - y_mean
+    x_means = np.mean(x_matrix, 0)
+    x_variance = np.var(x_matrix, 0)
+    x_matrix = (x_matrix - x_means) / x_variance
+    number_test_pts = 30
+    w_matrix = np.zeros((number_test_pts, np.shape(x_matrix)[1]))
+    for i in range(number_test_pts):
+        ws = ridge_regression(x_matrix, y_matrix, np.exp(i - 10))
+        w_matrix[i, :] = ws.T
+    return w_matrix
