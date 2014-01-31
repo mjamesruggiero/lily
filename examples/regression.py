@@ -102,5 +102,41 @@ def main():
     ridge_weights = regression.run_ridge_regression(ab_x, ab_y)
     logging.info("ridge_weights = {0}".format(ridge_weights))
 
+    # plot_ridge_weights(ridge_weights)
+    test_stagewise_regression()
+
+
+def plot_ridge_weights(ridge_weights):
+    """example of how, on the left, where lambda is small,
+    the coefficients are the same as in regular regression.
+    On the right, where lambdas are large, the coefficients shrink
+    to zero. In between the two extremes are values that will help you
+    make predicitons"""
+    import matplotlib.pyplot as plt
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.plot(ridge_weights)
+    plt.show()
+
+
+def test_stagewise_regression():
+    x_array, y_array = load_dataset('data/abalone.txt')
+    step_size = 0.001
+    iterations = 5000
+    regression.stage_wise_linear_regression(x_array,
+                                            y_array,
+                                            step_size,
+                                            iterations)
+
+    # and compare to least-squares regression
+    x_matrix = np.mat(x_array)
+    y_matrix = np.mat(y_array).T
+    x_matrix = regression.regularize(x_matrix)
+    y_mean = np.mean(y_matrix, 0)
+    y_matrix = y_matrix - y_mean
+    weights = regression.standard_regression(x_matrix, y_matrix.T)
+    logging.info("least-squares weights are {}".format(weights.T))
+
+
 if __name__ == '__main__':
     main()

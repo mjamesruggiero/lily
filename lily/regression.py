@@ -146,6 +146,8 @@ def ridge_regression(x_matrix, y_matrix, lamb=0.2):
     elements and zeros everywhere else.
     """
     x_t_x = x_matrix.T * x_matrix
+
+    # eye creates the identity matrix
     denominator = x_t_x * np.eye(np.shape(x_matrix)[1]) * lamb
     if np.linalg.det(denominator) == 0.0:
         logging.warning("The matrix is singular, cannot do inverse")
@@ -156,12 +158,18 @@ def ridge_regression(x_matrix, y_matrix, lamb=0.2):
 
 def run_ridge_regression(x_arr, y_arr):
     """
-    run ridge regression ofver a number of lambda values
+    run ridge regression over a number of lambda values;
+    remember that you need to normalize the date to give
+    each feature equal importance regardless of the units
+    in which it was measured. In this case, we normalize
+    by subtracting the mean from each feature
+    and dividing by the variance.
     """
     x_matrix = np.mat(x_arr)
     y_matrix = np.mat(y_arr).T
     y_mean = np.mean(y_matrix, 0)
     y_matrix = y_matrix - y_mean
+
     x_means = np.mean(x_matrix, 0)
     x_variance = np.var(x_matrix, 0)
     x_matrix = (x_matrix - x_means) / x_variance
@@ -171,3 +179,53 @@ def run_ridge_regression(x_arr, y_arr):
         ws = ridge_regression(x_matrix, y_matrix, np.exp(i - 10))
         w_matrix[i, :] = ws.T
     return w_matrix
+
+
+def stage_wise_linear_regression(x_arr,
+                                 y_arr,
+                                 eps=0.01,
+                                 number_iterations=100):
+    """
+    Greedily optimizes by looping all the possible
+    features to see how the error changes if you increase
+    or decrease that feature.
+    """
+    x_matrix = np.mat(x_arr)
+    y_matrix = np.mat(y_arr).T
+    y_mean = np.mean(y_matrix, 0)
+    y_matrix = y_matrix - y_mean
+    x_matrix = regularize(x_matrix)
+    m, n = np.shape(x_matrix)
+    return_mat = np.zeros((number_iterations, n))
+
+    ws = np.zeros((n, 1))
+    ws_test = ws.copy()
+    ws_max = ws.copy()
+    for i in range(number_iterations):
+        logging.info("ws.T = {0}".format(ws.T))
+        lowest_error = np.inf
+        for j in range(n):
+            for sign in [-1, 1]:
+                ws_test = ws.copy()
+                ws_test[j] += eps * sign
+                y_test = x_matrix * ws_test
+                rss_e = rss_error(y_matrix.A, y_test.A)
+                if rss_e < lowest_error:
+                    lowest_error = rss_e
+                    ws_max = ws_test
+        ws = ws_max.copy()
+        return_mat[i, :] = ws.T
+    return return_mat
+
+
+def regularize(x_matrix):
+    """
+    Regularize by columns
+    """
+    in_matrix = x_matrix.copy()
+
+    # calculate the mean, then subtract it away
+    in_means = np.mean(in_matrix, 0)
+    in_variance = np.var(in_matrix, 0)
+    in_matrix = (in_matrix - in_means) / in_variance
+    return in_matrix
