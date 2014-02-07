@@ -1,4 +1,6 @@
 import numpy as np
+import logging
+logging.basicConfig(level=logging.INFO, format="%(funcName)s\t%(message)s")
 
 
 def load_dataset(filepath):
@@ -93,3 +95,84 @@ def choose_best_split(data_set,
     if (np.shape(matrix_0)[0] < tol_n) or (np.shape(matrix_1)[0] < tol_n):
         return None, leaf_type(data_set)
     return best_index, best_value
+
+
+def is_tree(obj):
+    return type(obj).__name__ == 'dict'
+
+
+def get_mean(tree):
+    """
+    Descends a tree until it hits only leaf nodes. When it
+    finds two leaf nodes it takes the average of those two nodes.
+    """
+    if is_tree(tree['right']):
+        tree['right'] = get_mean(tree['right'])
+    if is_tree(tree['left']):
+        tree['left'] = get_mean(tree['left'])
+    return (tree['left'] + tree['right']) / 2.0
+
+
+def prune(tree, test_data):
+    """
+    Collapse the tree if there is no test data
+    """
+    if np.shape(test_data)[0] == 0:
+        return get_mean(tree)
+    if is_tree(tree['right']) or is_tree(tree['left']):
+        l_set, r_set = binary_split_dataset(test_data,
+                                            tree['spInd'],
+                                            tree['spVal'])
+    if is_tree(tree['left']):
+        tree['left'] = prune(tree['left'], l_set)
+    if is_tree(tree['right']):
+        tree['right'] = prune(tree['right'], r_set)
+
+    # neither one are trees; now you can merge
+    if not is_tree(tree['left']) and not is_tree(tree['right']):
+        l_set, r_set = binary_split_dataset(test_data,
+                                            tree['spInd'],
+                                            tree['spVal'])
+        left_merge_err = sum(np.power(l_set[:, -1] - tree['left'], 2))
+        right_merge_err = sum(np.power(r_set[:, -1] - tree['right'], 2))
+        error_no_merge = left_merge_err + right_merge_err
+        tree_mean = (tree['left'] + tree['right']) / 2.0
+        error_merge = sum(np.power(test_data[:, -1] - tree_mean, 2))
+        if error_merge < error_no_merge:
+            message = "merging and returning tree_mean: {0}"
+            logging.info(message.format(tree_mean))
+            return tree_mean
+        else:
+            return tree
+    else:
+        return tree
+
+
+def linearly_solve(data_set):
+    """
+    Format the dataset into the target variable Y
+    and the independent variable X.
+    Perform some simple linear regression.
+    """
+    m, n = np.shape(data_set)
+    x = np.mat(np.ones((m, n)))
+    y = np.mat(np.ones((m, 1)))
+    x[:, 1:n] = data_set[:, 0:n - 1]
+    y = data_set[:, -1]
+    x_t_x = x.T * x
+    if np.linalg.det(x_t_x) == 0.0:
+        raise NameError("This matrix is singular, cannot do inverse;\n\
+                        try increasing the second value of 'ops'")
+    weights = x_t_x.I * (x.T * y)
+    return weights, x, y
+
+
+def model_leaf(data_set):
+    weights, x, y = linearly_solve(data_set)
+    return weights
+
+
+def model_error(data_set):
+    weights, x, y = linearly_solve(data_set)
+    y_hat = x * weights
+    return sum(np.power(y - y_hat, 2))
