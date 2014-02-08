@@ -176,3 +176,42 @@ def model_error(data_set):
     weights, x, y = linearly_solve(data_set)
     y_hat = x * weights
     return sum(np.power(y - y_hat, 2))
+
+
+def tree_evaluation(model, _):
+    return float(model)
+
+
+def model_tree_evaluation(model, input_data):
+    n = np.shape(input_data)[1]
+    x = np.mat((1, n + 1))
+    x[:, 1: n + 1] = input_data
+    return float(x * model)
+
+
+def tree_forecast(tree, input_data, model_evaluator=tree_evaluation):
+    """
+    Gives one forecast for one data point, for a given tree.
+    """
+    if not is_tree(tree):
+        return model_evaluator(tree, input_data)
+    if input_data[tree['spInd']] > tree['spVal']:
+        if is_tree(tree['left']):
+            return tree_forecast(tree['left'], input_data, model_evaluator)
+        else:
+            return model_evaluator(tree['left'], input_data)
+    else:
+        if is_tree(tree['right']):
+            return tree_forecast(tree['right'], input_data, model_evaluator)
+        else:
+            return model_evaluator(tree['right'], input_data)
+
+
+def create_forecast(tree, test_data, model_evaluator=tree_evaluation):
+    m = len(test_data)
+    y_hat = np.mat(np.zeros((m, 1)))
+    for i in range(m):
+        y_hat[i, 0] = tree_forecast(tree,
+                                    np.mat(test_data[i]),
+                                    model_evaluator)
+    return y_hat
