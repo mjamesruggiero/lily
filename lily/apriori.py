@@ -3,7 +3,6 @@ logging.basicConfig(level=logging.INFO, format="%(funcName)s\t%(message)s")
 
 
 def createC1(dataset):
-    """docstring for createC1"""
     C1 = []
     for transaction in dataset:
         for item in transaction:
@@ -14,7 +13,6 @@ def createC1(dataset):
 
 
 def scan_d(dataset, candidate_sets, minimum_support):
-    """docstring for scan_d"""
     ss_count = {}
     for tid in dataset:
         for candidate in candidate_sets:

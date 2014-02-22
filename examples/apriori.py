@@ -70,7 +70,6 @@ def get_item_meanings(bill_titles):
 
 
 def get_translation_list(action_ids, bill_titles):
-    """docstring for get_translation_list"""
     translations = defaultdict(list)
     vote_count = 2
     item_meaning = get_item_meanings(bill_titles)
