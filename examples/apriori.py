@@ -94,27 +94,6 @@ def get_translation_list(action_ids, bill_titles):
     return translations, item_meaning
 
 
-def test_get_action_ids():
-    """
-    example meant for the REPL;
-    run this and destroy
-    """
-    action_ids, bill_titles = get_action_ids()
-
-
-def test_translations():
-    """
-    another basic test pre-amble;
-    if this works, go ahead and destroy
-    """
-    action_ids, bill_titles = get_action_ids()
-    logging.info("action_ids are {}".format(action_ids))
-    translations, item_meanings = get_translation_list(action_ids[:2],
-                                                       bill_titles[:2])
-    for key in translations:
-        logging.info(translations[key])
-
-
 def test_voting_with_apriori():
     """
     the final driver
