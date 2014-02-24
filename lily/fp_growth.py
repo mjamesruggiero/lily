@@ -140,9 +140,9 @@ def mine_tree(input_tree,
               minimum_support,
               prefix,
               frequent_items):
-    big_l = [v[0] for v in sorted(header_table.items(),
-                                  key=lambda p: p[1])]
-    for base_pattern in big_l:
+    base_patterns = [v[0] for v in sorted(header_table.items(),
+                                          key=lambda p: p[1])]
+    for base_pattern in base_patterns:
         new_frequent_set = prefix.copy()
         new_frequent_set.add(base_pattern)
         frequent_items.append(new_frequent_set)
