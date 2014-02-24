@@ -27,9 +27,9 @@ def classify_0(in_x, data_set, labels, k):
 
     # distance
     diff_mat = tile(in_x, (data_set_size, 1)) - data_set
-    sq_diff_mat = diff_mat**2
+    sq_diff_mat = diff_mat ** 2
     sq_distances = sq_diff_mat.sum(axis=1)
-    distances = sq_distances**0.5
+    distances = sq_distances ** 0.5
 
     # argsort pulls indices corresponding
     # to sorted array
@@ -98,7 +98,7 @@ def train_naive_bayes0(training_matrix, training_category):
     word_count = len(training_matrix[0])
 
     #initialize probablilities; 0 or 1
-    prob_1 = sum(training_category)/float(training_element_count)
+    prob_1 = sum(training_category) / float(training_element_count)
     p0_num = ones(word_count)
     p1_num = ones(word_count)
     p0_denom = 2.0
@@ -113,8 +113,8 @@ def train_naive_bayes0(training_matrix, training_category):
             p0_denom += sum(training_matrix[i])
 
     # change to log() to help with underflow
-    p1_vector = log(p1_num/p1_denom)
-    p0_vector = log(p0_num/p0_denom)
+    p1_vector = log(p1_num / p1_denom)
+    p0_vector = log(p0_num / p0_denom)
     return p0_vector, p1_vector, prob_1
 
 
@@ -139,7 +139,7 @@ def create_vocabulary(data_set):
 
 
 def bag_of_words_to_vector(vocabulary_list, input_set):
-    return_vec = [0]*len(vocabulary_list)
+    return_vec = [0] * len(vocabulary_list)
     for word in input_set:
         if word in vocabulary_list:
             return_vec[vocabulary_list.index(word)] += 1
@@ -148,10 +148,7 @@ def bag_of_words_to_vector(vocabulary_list, input_set):
 
 def calculate_most_frequent(vocabulary, full_text, limit=30):
     """calculate the frequency of occurrence"""
-    frequency_dict = {}
-
-    for token in vocabulary:
-        frequency_dict[token] = full_text.count(token)
+    frequency_dict = {token: full_text.count(token) for token in vocabulary}
 
     sorted_frequency = sorted(frequency_dict.iteritems(),
                               key=operator.itemgetter(1),
