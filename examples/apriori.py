@@ -1,25 +1,15 @@
 import os
 import sys
 from collections import defaultdict
-from lily import apriori
 from time import sleep
 from votesmart import votesmart
 import logging
 sys.path.insert(0, os.path.abspath('..'))
 import lily
+from lily import apriori
+from lily import utils
 
 logging.basicConfig(level=logging.INFO, format="%(funcName)s\t%(message)s")
-
-
-def get_env_config(key='VOTESMART_API_KEY'):
-    """
-    Grab environment variable
-    """
-    try:
-        return os.environ[key]
-    except KeyError:
-        message = "Please set the {k} environment variable"
-        raise RuntimeError(message.format(k=key))
 
 
 def action_is_final(action):
@@ -29,7 +19,7 @@ def action_is_final(action):
 
 
 def get_action_ids():
-    votesmart.apikey = get_env_config()
+    votesmart.apikey = utils.get_env_config()
     action_id_list = []
     bill_title_list = []
     fr = open('data/recent_20_bills.txt')
