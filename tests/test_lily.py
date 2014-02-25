@@ -102,7 +102,7 @@ class TestLily(unittest.TestCase):
                        u'are', u'our', u'for', u'that', u'you')
         for expect in expect_true:
             self.assertTrue(core.is_stopword(expect, stopwords),
-                            "did not see {0} as stopword".format(expect))
+                            "did not see '{0}' as stopword".format(expect))
 
     def test_is_not_stopword(self):
         """

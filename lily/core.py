@@ -173,13 +173,9 @@ def save_to_csv(itera, filepath, headers=None):
 
 
 def get_stopwords(stopwords_file):
-    fr = open(stopwords_file)
-    all_lines = fr.readlines()
-    stopwords = []
-
-    for i, line in enumerate(all_lines):
-        stopwords.append(line.strip())
-    return set(stopwords)
+    with open(stopwords_file) as fr:
+        all_lines = fr.readlines()
+    return set([line.strip() for line in all_lines])
 
 
 def is_stopword(word, stopwords):
