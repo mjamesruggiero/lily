@@ -26,19 +26,6 @@ def classify(input_tree, feature_labels, test_vector):
     return class_label
 
 
-def create_dataset():
-    """
-    sample data for shannon entropy test
-    """
-    data_set = [[1, 1, 'yes'],
-                [1, 1, 'yes'],
-                [1, 0, 'no'],
-                [0, 1, 'no'],
-                [0, 1, 'no']]
-    labels = ['no surfacing', 'flippers']
-    return data_set, labels
-
-
 def store_tree(input_tree, filename):
     import pickle
     fw = open(filename, 'w')
