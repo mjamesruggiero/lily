@@ -95,8 +95,6 @@ def calculate_confidence(freq_set,
     for conseq in h:
         conf = support_data[freq_set] / support_data[freq_set - conseq]
         if conf >= minimum_confidence:
-            logging.info("{0} --> {1}, conf: {2}".
-                         format(freq_set - conseq, conseq, conf))
             big_rule_list.append((freq_set - conseq, conseq, conf))
             pruned_h.append(conseq)
     return pruned_h
