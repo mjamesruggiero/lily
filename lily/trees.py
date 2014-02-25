@@ -1,6 +1,6 @@
 import logging
 import math
-import operator
+from collections import Counter
 
 FORMAT = "%(lineno)d\t%(message)s"
 logging.basicConfig(level=logging.ERROR, format=FORMAT)
@@ -63,7 +63,7 @@ def split_data_set(data_set, axis, value):
     for feature_vec in data_set:
         if feature_vec[axis] == value:
             reduced_feature_vec = feature_vec[:axis]
-            reduced_feature_vec.extend(feature_vec[axis+1:])
+            reduced_feature_vec.extend(feature_vec[axis + 1:])
             logging.info("reduced_feature_vec:\t{0}".
                          format(reduced_feature_vec))
             ret_data_set.append(reduced_feature_vec)
@@ -85,7 +85,7 @@ def choose_best_feature_to_split(data_set):
         new_entropy = 0.0
         for value in unique_values:
             sub_data_set = split_data_set(data_set, i, value)
-            prob = len(sub_data_set)/float(len(data_set))
+            prob = len(sub_data_set) / float(len(data_set))
 
             new_entropy += prob * calculate_shannon_entropy(sub_data_set)
             logging.info("value is {0}; prob is {1}; new entropy is {2}".
@@ -103,15 +103,14 @@ def choose_best_feature_to_split(data_set):
 
 
 def majority_count(class_list):
-    class_count = {}
-    for vote in class_list:
-        if vote not in class_count.keys():
-            class_count[vote] = 0
-        class_count[vote] += 1
-    sorted_class_count = sorted(class_count.iteritems(),
-                                key=operator.itemgetter(1),
-                                reverse=True)
-    return sorted_class_count[0][0]
+    """
+    Take a list of class names; build
+    a dict whose keys are the unique names.
+    Count the frequency, and return the one
+    with the greatest frequency
+    """
+    class_count = Counter(class_list)
+    return class_count.most_common()[0][0]
 
 
 def calculate_shannon_entropy(data_set):
@@ -134,7 +133,7 @@ def calculate_shannon_entropy(data_set):
 
     shannon_entropy = 0.0
     for key in label_counts:
-        prob = float(label_counts[key])/num_entries
+        prob = float(label_counts[key]) / num_entries
         shannon_entropy -= prob * math.log(prob, 2)
     return shannon_entropy
 

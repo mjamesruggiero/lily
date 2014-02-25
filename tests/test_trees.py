@@ -22,34 +22,35 @@ class TestTrees(unittest.TestCase):
         lensesTree = trees.create_tree(self.lenses, self.lenses_labels)
         logging.info("the lenses tree is {0}".format(lensesTree))
 
-        expected = {'tearRate': {
-            'reduced': 'no lenses',
-            'normal': {
-                'astigmatic': {
-                    'yes': {
-                        'prescript': {
-                            'hyper': {
-                                'age': {
-                                    'pre': 'no lenses',
-                                    'presbyopic': 'no lenses',
-                                    'young': 'hard'}},
+        expected = {
+            'tearRate': {
+                'reduced': 'no lenses',
+                'normal': {
+                    'astigmatic': {
+                        'yes': {
+                            'prescript': {
+                                'hyper': {
+                                    'age': {
+                                        'pre': 'no lenses',
+                                        'presbyopic': 'no lenses',
+                                        'young': 'hard'}},
                                 'myope': 'hard'}
                         },
-                    'no': {
-                        'age': {
-                            'pre': 'soft',
-                            'presbyopic': {
-                                'prescript': {
-                                    'hyper': 'soft',
-                                    'myope': 'no lenses'}
+                        'no': {
+                            'age': {
+                                'pre': 'soft',
+                                'presbyopic': {
+                                    'prescript': {
+                                        'hyper': 'soft',
+                                        'myope': 'no lenses'}
                                 },
-                            'young': 'soft'
+                                'young': 'soft'
                             }
                         }
                     }
                 }
             }
-            }
+        }
         self.assertEqual(expected, lensesTree)
 
     def create_dataset(self):
@@ -85,6 +86,14 @@ class TestTrees(unittest.TestCase):
         my_data, labels = self.create_dataset()
         returned = trees.choose_best_feature_to_split(my_data)
         self.assertEqual(0, returned)
+
+    def test_majority_count(self):
+        """trees - majority_count returns most common element """
+        animals = ['cow', 'chicken', 'chicken',
+                   'hen', 'chicken', 'chicken', 'fox', 'fox',
+                   ]
+        returned = trees.majority_count(animals)
+        self.assertEqual(returned, 'chicken')
 
 if __name__ == '__main__':
     unittest.main()
