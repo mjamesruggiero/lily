@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 import logging
 logging.basicConfig(level=logging.INFO, format="%(funcName)s\t%(message)s")
 
@@ -13,23 +15,26 @@ def createC1(dataset):
 
 
 def scan_d(dataset, candidate_sets, minimum_support):
-    ss_count = {}
-    for tid in dataset:
-        for candidate in candidate_sets:
-            if candidate.issubset(tid):
-                if candidate not in ss_count:
-                    ss_count[candidate] = 1
-                else:
-                    ss_count[candidate] += 1
+    ss_count = count_candiates(candidate_sets, dataset)
     num_items = float(len(dataset))
     return_list = []
     support_data = {}
+
     for key in ss_count:
         support = ss_count[key] / num_items
         if support >= minimum_support:
             return_list.insert(0, key)
         support_data[key] = support
     return return_list, support_data
+
+
+def count_candiates(candidate_sets, dataset):
+    counts = defaultdict(int)
+    for element in dataset:
+        for candidate in candidate_sets:
+            if candidate.issubset(element):
+                counts[candidate] += 1
+    return counts
 
 
 def apriori_generate(Lk, k):
