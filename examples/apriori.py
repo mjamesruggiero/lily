@@ -99,7 +99,7 @@ def test_voting_with_apriori():
     for confidence_level in confidence_levels:
         logging.info("confidence level:\t{sl}".format(sl=confidence_level))
         rules = apriori.generate_rules(L, support_data, confidence_level)
-        logging.info("rules:\n{r}".format(r=rules))
+        #logging.info("rules:\n{r}".format(r=rules))
 
 
 def main():
