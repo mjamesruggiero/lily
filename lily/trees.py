@@ -1,6 +1,6 @@
 import logging
 import math
-from collections import Counter
+from collections import Counter, defaultdict
 
 FORMAT = "%(lineno)d\t%(message)s"
 logging.basicConfig(level=logging.ERROR, format=FORMAT)
@@ -104,9 +104,8 @@ def choose_best_feature_to_split(data_set):
 
 def majority_count(class_list):
     """
-    Take a list of class names; build
-    a dict whose keys are the unique names.
-    Count the frequency, and return the one
+    Take a list of class names;
+    return the one
     with the greatest frequency
     """
     class_count = Counter(class_list)
@@ -124,11 +123,9 @@ def calculate_shannon_entropy(data_set):
     then sum this up for all the labels
     """
     num_entries = len(data_set)
-    label_counts = {}
+    label_counts = defaultdict(int)
     for feature_vec in data_set:
         current_label = feature_vec[-1]
-        if current_label not in label_counts.keys():
-            label_counts[current_label] = 0
         label_counts[current_label] += 1
 
     shannon_entropy = 0.0

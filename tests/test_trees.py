@@ -88,10 +88,11 @@ class TestTrees(unittest.TestCase):
         self.assertEqual(0, returned)
 
     def test_majority_count(self):
-        """trees - majority_count returns most common element """
-        animals = ['cow', 'chicken', 'chicken',
-                   'hen', 'chicken', 'chicken', 'fox', 'fox',
-                   ]
+        """
+        trees - majority_count returns most common element
+        """
+        animals = ['cow', 'chicken', 'chicken', 'fox'
+                   'hen', 'chicken', 'chicken', 'fox', 'fox']
         returned = trees.majority_count(animals)
         self.assertEqual(returned, 'chicken')
 
