@@ -120,7 +120,7 @@ def ascend_tree(leaf_node, prefix_path):
         ascend_tree(leaf_node.parent, prefix_path)
 
 
-def find_prefix_path(base_pattern, tree_node):
+def find_prefix_path(tree_node):
     """
     Generate a conditional pattern base given a single item.
     Visit every node in the tree that contains that item
@@ -147,14 +147,10 @@ def mine_tree(input_tree,
         new_frequent_set.add(base_pattern)
         frequent_items.append(new_frequent_set)
         conditional_pattern_bases =\
-            find_prefix_path(base_pattern,
-                             header_table[base_pattern][1])
+            find_prefix_path(header_table[base_pattern][1])
         condition_tree, head = create_tree(conditional_pattern_bases,
                                            minimum_support)
         if head is not None:
-            logging.info("conditional tree for: {nf}".
-                         format(nf=new_frequent_set))
-            condition_tree.display(1)
             mine_tree(condition_tree,
                       head,
                       minimum_support,

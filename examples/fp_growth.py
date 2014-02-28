@@ -11,17 +11,6 @@ import re
 logging.basicConfig(level=logging.INFO, format="%(funcName)s\t%(message)s")
 
 
-def load_simple_data():
-    return [
-        ['r', 'z', 'h', 'j', 'p'],
-        ['z', 'y', 'x', 'w', 'v', 'u', 't', 's'],
-        ['z'],
-        ['r', 'x', 'n', 'o', 's'],
-        ['y', 'r', 'x', 'z', 'q', 't', 'p'],
-        ['y', 'z', 'x', 'e', 'q', 's', 't', 'm'],
-    ]
-
-
 def create_initial_set(dataset):
     return_dict = {}
     for transaction in dataset:
@@ -75,25 +64,8 @@ def twitter_test():
         print t
 
 
-def simple_test():
-    initial_set = create_initial_set(load_simple_data())
-    logging.info("initial_set = {i}".format(i=initial_set))
-    min_sup = 3
-    fp_tree, header_table = fp_growth.create_tree(initial_set, min_sup)
-    fp_tree.display()
-
-    frequent_items = []
-    mined = fp_growth.mine_tree(fp_tree,
-                                header_table,
-                                3,
-                                set([]),
-                                frequent_items)
-    logging.info("mined = {m}".format(m=mined))
-
-
 def main():
     twitter_test()
-
 
 if __name__ == '__main__':
     main()
