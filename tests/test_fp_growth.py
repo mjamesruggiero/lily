@@ -16,6 +16,8 @@ class TestTestFpGrowth(unittest.TestCase):
             ['y', 'r', 'x', 'z', 'q', 't', 'p'],
             ['y', 'z', 'x', 'e', 'q', 's', 't', 'm'],
         ]
+        self.init_set = self.create_initial_set(self.dataset)
+        self.tree, self.header = fp_growth.create_tree(self.init_set, 3)
 
     def create_initial_set(self, dataset):
         return_dict = {}
@@ -27,9 +29,8 @@ class TestTestFpGrowth(unittest.TestCase):
         """
         fp_growth - find_prefix_path builds conditional pattern base
         """
-        init_set = self.create_initial_set(self.dataset)
-        tree, header = fp_growth.create_tree(init_set, 3)
-        conditional_pattern_base = fp_growth.find_prefix_path(header['r'][1])
+        conditional_pattern_base =\
+            fp_growth.find_prefix_path(self.header['r'][1])
         expected = {
             frozenset(['x', 's']): 1,
             frozenset(['z']): 1,
@@ -41,11 +42,9 @@ class TestTestFpGrowth(unittest.TestCase):
         """
         fp_growth - mine tree returns frequent word sets
         """
-        init_set = self.create_initial_set(self.dataset)
-        tree, header = fp_growth.create_tree(init_set, 3)
         frequent_items = []
-        fp_growth.mine_tree(tree,
-                            header,
+        fp_growth.mine_tree(self.tree,
+                            self.header,
                             3,
                             set([]),
                             frequent_items)
