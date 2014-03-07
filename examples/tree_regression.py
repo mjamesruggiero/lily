@@ -9,8 +9,18 @@ import logging
 logging.basicConfig(level=logging.INFO, format="%(funcName)s\t%(message)s")
 
 
+def load_dataset(filepath):
+    data_matrix = []
+    fr = open(filepath)
+    for line in fr.readlines():
+        current_line = line.strip().split('\t')
+        line_values = map(float, current_line)
+        data_matrix.append(line_values)
+    return data_matrix
+
+
 def very_simple_tree():
-    data = regression_trees.load_dataset('data/ex00.txt')
+    data = load_dataset('data/ex00.txt')
     matrix = np.mat(data)
     tree = regression_trees.create_tree(matrix)
     log_formatted_tree(tree, "the tree")
