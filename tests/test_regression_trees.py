@@ -29,5 +29,15 @@ class TestRegressionTrees(unittest.TestCase):
         """regression_trees - is_tree returns false for non-dict"""
         self.assertFalse(regression_trees.is_tree(set((1, 2))))
 
+    def test_integration(self):
+        """regression_trees - capture tree result; mostly for refactoring"""
+        expected = {
+            'left': 1.018096767241379,
+            'right': -0.044650285714285733,
+            'spInd': 0,
+            'spVal': np.matrix([[0.48813]])
+        }
+        self.assertEqual(expected, self.tree)
+
 if __name__ == '__main__':
     unittest.main()

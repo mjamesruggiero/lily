@@ -3,16 +3,6 @@ import logging
 logging.basicConfig(level=logging.INFO, format="%(funcName)s\t%(message)s")
 
 
-def load_dataset(filepath):
-    data_matrix = []
-    fr = open(filepath)
-    for line in fr.readlines():
-        current_line = line.strip().split('\t')
-        line_values = map(float, current_line)
-        data_matrix.append(line_values)
-    return data_matrix
-
-
 def binary_split_dataset(data_set, feature, value):
     """
     use array filtering to partition data on the given
@@ -23,17 +13,17 @@ def binary_split_dataset(data_set, feature, value):
     return matrix_0, matrix_1
 
 
-def reg_leaf(data_set):
+def generate_leaf_model(data_set):
     return np.mean(data_set[:, -1])
 
 
-def reg_err(data_set):
+def get_squared_error(data_set):
     return np.var(data_set[:, 1]) * np.shape(data_set)[0]
 
 
 def create_tree(data_set,
-                leaf_type=reg_leaf,
-                error_type=reg_err,
+                leaf_type=generate_leaf_model,
+                error_type=get_squared_error,
                 ops=(1, 4)):
     """
     First attempts to split the dataset into 2 parts,
@@ -61,16 +51,16 @@ def create_tree(data_set,
 
 
 def choose_best_split(data_set,
-                      leaf_type=reg_leaf,
-                      error_type=reg_err,
+                      leaf_type=generate_leaf_model,
+                      error_type=get_squared_error,
                       ops=(1, 4)):
-    tol_s = ops[0]
-    tol_n = ops[1]
-    if len(set(data_set[:, -1].T.tolist()[0])) == 1:
+    error_reduction_tolerance = ops[0]
+    minimum_split_instances = ops[1]
+    if all_values_are_equal(data_set):
         return None, leaf_type(data_set)
     m, n = np.shape(data_set)
-    s = error_type(data_set)
-    best_s = np.inf
+    error_on_existing_dataset = error_type(data_set)
+    best_error = np.inf
     best_index = 0
     best_value = 0
 
@@ -79,22 +69,27 @@ def choose_best_split(data_set,
             matrix_0, matrix_1 = binary_split_dataset(data_set,
                                                       feature_index,
                                                       split_value)
-            if (np.shape(matrix_0)[0] < tol_n) or \
-                    (np.shape(matrix_1)[0] < tol_n):
+            if (np.shape(matrix_0)[0] < minimum_split_instances) or \
+                    (np.shape(matrix_1)[0] < minimum_split_instances):
                 continue
-            new_s = error_type(matrix_0) + error_type(matrix_1)
-            if new_s < best_s:
+            new_error = error_type(matrix_0) + error_type(matrix_1)
+            if new_error < best_error:
                 best_index = feature_index
                 best_value = split_value
-                best_s = new_s
-    if (s - best_s) < tol_s:
+                best_error = new_error
+    if (error_on_existing_dataset - best_error) < error_reduction_tolerance:
         return None, leaf_type(data_set)
     matrix_0, matrix_1 = binary_split_dataset(data_set,
                                               best_index,
                                               best_value)
-    if (np.shape(matrix_0)[0] < tol_n) or (np.shape(matrix_1)[0] < tol_n):
+    if (np.shape(matrix_0)[0] < minimum_split_instances) or\
+            (np.shape(matrix_1)[0] < minimum_split_instances):
         return None, leaf_type(data_set)
     return best_index, best_value
+
+
+def all_values_are_equal(data_set):
+    return len(set(data_set[:, -1].T.tolist()[0])) == 1
 
 
 def is_tree(obj):
