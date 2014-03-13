@@ -8,6 +8,9 @@ def binary_split_dataset(data_set, feature, value):
     use array filtering to partition data on the given
     feature and value
     """
+    logging.info("dataset looks like {d}".format(d=data_set))
+    logging.info("feature is {f} and value is {v}".format(f=feature,
+                                                          v=value))
     matrix_0 = data_set[np.nonzero(data_set[:, feature] > value)[0], :][0]
     matrix_1 = data_set[np.nonzero(data_set[:, feature] <= value)[0], :][0]
     return matrix_0, matrix_1

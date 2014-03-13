@@ -9,8 +9,8 @@ logging.basicConfig(level=logging.INFO, format="%(lineno)d\t%(message)s")
 
 class TestRegressionTrees(unittest.TestCase):
     def setUp(self):
-        data = self._load_test_data('data/ex00.txt')
-        self.tree = regression_trees.create_tree(np.mat(data))
+        self.data = self._load_test_data('data/ex00.txt')
+        self.tree = regression_trees.create_tree(np.mat(self.data))
 
     def _load_test_data(self, filepath):
         data_matrix = []
@@ -38,6 +38,25 @@ class TestRegressionTrees(unittest.TestCase):
             'spVal': np.matrix([[0.48813]])
         }
         self.assertEqual(expected, self.tree)
+
+    def test_get_mean(self):
+        """regression_trees - get_mean returns correct value"""
+        mean = regression_trees.get_mean(self.tree)
+        expected = 0.48672324076354662
+        self.assertEqual(expected, mean)
+
+    def test_binary_spit_dataset(self):
+        """regression_trees - binary_spit_dataset splits on feature"""
+        value = np.mat([[6]])
+        dataset = np.mat([
+            [7, 8, 6],
+            [4, 5, 6],
+            [1, 1, 1],
+            [1, 2, 3],
+        ])
+        left, right = regression_trees.binary_split_dataset(dataset, 0, value)
+        self.assertEqual(np.mat([1]), left.any())
+        self.assertEqual(np.mat([1]), right.any())
 
 if __name__ == '__main__':
     unittest.main()
