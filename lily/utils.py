@@ -13,6 +13,28 @@ def load_dataset(file_path):
     return data_matrix, label_matrix
 
 
+def load_tsv_datafile(filename):
+    """
+    load TSV datafile into list of data
+    and corresponding labels;
+    feature labels sit
+    in the last (farthest-right) column
+    (i.e. a 1 or a 0)
+    """
+    number_of_features = len(open(filename).readline().split('\t'))
+    data_matrix = []
+    label_matrix = []
+    fr = open(filename)
+    for line in fr.readlines():
+        pieces = []
+        current_line = line.strip().split('\t')
+        for i in range(number_of_features - 1):
+            pieces.append(float(current_line[i]))
+        data_matrix.append(pieces)
+        label_matrix.append(float(current_line[-1]))
+    return data_matrix, label_matrix
+
+
 def get_env_config(key='VOTESMART_API_KEY'):
     """
     Grab environment variable

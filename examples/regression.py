@@ -2,28 +2,14 @@ import os
 import sys
 sys.path.insert(0, os.path.abspath('..'))
 import lily.regression as regression
+import lily.utils as utils
 import logging
 import numpy as np
 logging.basicConfig(level=logging.INFO, format="%(funcName)s\t%(message)s")
 
 
-def load_dataset(filename):
-    number_of_features = len(open(filename).readline().split('\t'))
-    data_matrix = []
-    label_matrix = []
-    fr = open(filename)
-    for line in fr.readlines():
-        pieces = []
-        current_line = line.strip().split('\t')
-        for i in range(number_of_features - 1):
-            pieces.append(float(current_line[i]))
-        data_matrix.append(pieces)
-        label_matrix.append(float(current_line[-1]))
-    return data_matrix, label_matrix
-
-
 def plot_best_fit_line():
-    x_arr, y_arr = load_dataset('data/ex0.txt')
+    x_arr, y_arr = utils.load_tsv_datafile('data/ex0.txt')
     logging.info("x_arr[0:2] = {}".format(x_arr[0:2]))
     ws = regression.standard_regression(x_arr, y_arr)
     logging.info("ws looks like {}".format(ws))
@@ -63,7 +49,7 @@ def lwlr_test(test_arr, x_arr, y_arr, k=1.0):
 
 
 def main():
-    ab_x, ab_y = load_dataset('data/abalone.txt')
+    ab_x, ab_y = utils.load_tsv_datafile('data/abalone.txt')
     y_hat_01 = lwlr_test(ab_x[0:99],
                          ab_x[0:99],
                          ab_y[0:99],
@@ -120,7 +106,7 @@ def plot_ridge_weights(ridge_weights):
 
 
 def test_stagewise_regression():
-    x_array, y_array = load_dataset('data/abalone.txt')
+    x_array, y_array = utils.load_tsv_datafile('data/abalone.txt')
     step_size = 0.001
     iterations = 5000
     regression.stage_wise_linear_regression(x_array,

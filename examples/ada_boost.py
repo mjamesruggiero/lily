@@ -5,6 +5,7 @@ import sys
 import numpy as np
 sys.path.insert(0, os.path.abspath('..'))
 from lily import ada_boost
+from lily import utils
 
 import logging
 logging.basicConfig(level=logging.INFO, format="%(funcName)s\t%(message)s")
@@ -42,27 +43,12 @@ def test_classification():
     logging.info("classifications: {c}".format(c=classifications))
 
 
-def load_dataset(filename):
-    number_of_features = len(open(filename).readline().split('\t'))
-    data_matrix = []
-    label_matrix = []
-    fr = open(filename)
-    for line in fr.readlines():
-        pieces = []
-        current_line = line.strip().split('\t')
-        for i in range(number_of_features - 1):
-            pieces.append(float(current_line[i]))
-        data_matrix.append(pieces)
-        label_matrix.append(float(current_line[-1]))
-    return data_matrix, label_matrix
-
-
 def test_horse_colic():
-    data, labels = load_dataset('data/horseColicTraining.txt')
+    data, labels = utils.load_tsv_datafile('data/horseColicTraining.txt')
     classifier_array, aggregated_class_estimates =\
         ada_boost.train_dataset(data, labels, 10)
 
-    test_data, test_labels = load_dataset('data/horseColicTest.txt')
+    test_data, test_labels = utils.load_tsv_datafile('data/horseColicTest.txt')
     prediction10 = ada_boost.classify(test_data, classifier_array)
 
     # calculate the error
@@ -76,7 +62,7 @@ def test_horse_colic():
 
 def test_compute_horse_auc():
     """plot the AUC for the horse colic data"""
-    data, labels = load_dataset('data/horseColicTraining.txt')
+    data, labels = utils.load_tsv_datafile('data/horseColicTraining.txt')
     classifier_array, aggregated_class_estimates =\
         ada_boost.train_dataset(data, labels, 40)
     ada_boost.plot_roc(aggregated_class_estimates.T, labels)

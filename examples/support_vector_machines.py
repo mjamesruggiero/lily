@@ -3,25 +3,15 @@ import sys
 sys.path.insert(0, os.path.abspath('..'))
 from lily import svm
 from lily import optimizer
+from lily import utils
 from numpy import mat, nonzero, shape, multiply, sign, zeros
 
 import logging
 logging.basicConfig(level=logging.INFO, format="%(funcName)s\t%(message)s")
 
 
-def load_dataset(file_name):
-    data_matrix = []
-    label_matrix = []
-    fr = open(file_name)
-    for line in fr.readlines():
-            line_array = line.strip().split('\t')
-            data_matrix.append([float(line_array[0]), float(line_array[1])])
-            label_matrix.append(float(line_array[2]))
-    return data_matrix, label_matrix
-
-
 def demo_classification():
-    data_array, label_array = load_dataset('data/svm_test_set.txt')
+    data_array, label_array = utils.load_dataset('data/svm_test_set.txt')
     b, alphas = svm.platt_outer_loop(data_array, label_array, 0.6, 0.001, 40)
     ws = svm.calculate_ws(alphas, data_array, label_array)
     data_matrix = mat(data_array)
@@ -34,7 +24,7 @@ def demo_classification():
 
 
 def optimized_smo():
-    data_array, label_array = load_dataset('data/svm_test_set.txt')
+    data_array, label_array = utils.load_dataset('data/svm_test_set.txt')
     b, alphas = svm.platt_outer_loop(data_array, label_array, 0.6, 0.001, 40)
     return b, alphas
 
@@ -73,7 +63,7 @@ def test_rbf(train_data,
                                                     alphas[sv_index]) + b
         if sign(prediction) != sign(train_labels[i]):
             error_count += 1
-    print "training error rate: {0}".format(float(error_count)/m)
+    print "training error rate: {0}".format(float(error_count) / m)
 
     error_count = 0
     data_matrix = mat(test_data)
@@ -87,7 +77,7 @@ def test_rbf(train_data,
                                                     alphas[sv_index]) + b
         if sign(prediction) != sign(test_labels[i]):
             error_count += 1
-    print "test error rate: {0}".format(float(error_count)/m)
+    print "test error rate: {0}".format(float(error_count) / m)
 
 
 def load_images(directory):
@@ -132,7 +122,7 @@ def img_to_vector(filename):
     for i in range(32):
         line_str = fr.readline()
         for j in range(32):
-            return_vector[0, 32*i+j] = int(line_str[j])
+            return_vector[0, 32 * i + j] = int(line_str[j])
     return return_vector
 
 
