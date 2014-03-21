@@ -1,13 +1,6 @@
 import numpy as np
 
 
-def load_dataset(filepath, delim='\t'):
-    fr = open(filepath)
-    strings = [line.strip().split(delim) for line in fr.readlines()]
-    data = [map(float, line) for line in strings]
-    return np.mat(data)
-
-
 def pca(data_matrix, top_n_features=9999999):
     """the PCA algorithm"""
     mean_values = np.mean(data_matrix, axis=0)
