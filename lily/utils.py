@@ -13,6 +13,16 @@ def load_dataset(file_path):
     return data_matrix, label_matrix
 
 
+def load_tsv_into_array(filepath):
+    dataset = []
+    fr = open(filepath)
+    for line in fr.readlines():
+        current_line = line.strip().split('\t')
+        float_line = map(float, current_line)
+        dataset.append(float_line)
+    return dataset
+
+
 def load_tsv_datafile(filename):
     """
     load TSV datafile into list of data

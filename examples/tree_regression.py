@@ -2,6 +2,7 @@ import os
 import sys
 sys.path.insert(0, os.path.abspath('..'))
 from lily import regression_trees
+from lily import utils
 import numpy as np
 import pprint
 
@@ -9,25 +10,15 @@ import logging
 logging.basicConfig(level=logging.INFO, format="%(funcName)s\t%(message)s")
 
 
-def load_dataset(filepath):
-    data_matrix = []
-    fr = open(filepath)
-    for line in fr.readlines():
-        current_line = line.strip().split('\t')
-        line_values = map(float, current_line)
-        data_matrix.append(line_values)
-    return data_matrix
-
-
 def very_simple_tree():
-    data = load_dataset('data/ex00.txt')
+    data = utils.load_tsv_into_array('data/ex00.txt')
     matrix = np.mat(data)
     tree = regression_trees.create_tree(matrix)
     log_formatted_tree(tree, "the tree")
 
 
 def more_complex_tree():
-    data = regression_trees.load_dataset('data/ex0.txt')
+    data = utils.load_tsv_into_array('data/ex0.txt')
     matrix = np.mat(data)
     tree = regression_trees.create_tree(matrix, ops=(0, 1))
     return tree
@@ -42,7 +33,7 @@ def pruning_example():
     complex_tree = more_complex_tree()
     log_formatted_tree(complex_tree)
 
-    my_data = regression_trees.load_dataset('data/ex2test.txt')
+    my_data = utils.load_tsv_into_array('data/ex2test.txt')
     my_matrix = np.mat(my_data)
     pruned = regression_trees.prune(complex_tree, my_matrix)
 
@@ -50,7 +41,7 @@ def pruning_example():
 
 
 def piecewise_linear_solve_example():
-    matrix_2 = np.mat(regression_trees.load_dataset('data/exp2.txt'))
+    matrix_2 = np.mat(utils.load_tsv_into_array('data/exp2.txt'))
     model_tree = regression_trees.create_tree(matrix_2,
                                               regression_trees.model_leaf,
                                               regression_trees.model_error)
@@ -62,10 +53,12 @@ def forecasting_models_example():
     Build 3 models and evaluate the performance of model trees,
     regression trees and standard linear regression.
     """
-    training_matrix = np.mat(regression_trees.
-                             load_dataset('data/bikeSpeedVsIq_train.txt'))
-    test_matrix = np.mat(regression_trees.
-                         load_dataset('data/bikeSpeedVsIq_test.txt'))
+    train_file = 'data/bikeSpeedVsIq_train.txt'
+    test_file = 'data/bikeSpeedVsIq_test.txt'
+    training_matrix = np.mat(utils.
+                             load_tsv_into_array(train_file))
+    test_matrix = np.mat(utils.
+                         load_tsv_into_array(test_file))
 
     # training tree
     tree = regression_trees.create_tree(training_matrix, ops=(1, 20))
