@@ -2,3 +2,5 @@
 TODO.txt
 tags
 .ropeproject
+tests/cover/
+.coverage
