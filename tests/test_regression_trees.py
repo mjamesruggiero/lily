@@ -45,8 +45,8 @@ class TestRegressionTrees(unittest.TestCase):
         expected = 0.48672324076354662
         self.assertEqual(expected, mean)
 
-    def test_binary_spit_dataset(self):
-        """regression_trees - binary_spit_dataset splits on feature"""
+    def test_binary_split_dataset(self):
+        """regression_trees - binary_split_dataset splits on feature"""
         value = np.mat([[6]])
         dataset = np.mat([
             [7, 8, 6],

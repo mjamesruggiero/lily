@@ -132,9 +132,6 @@ def classify(data_to_classify, classifiers):
                                         classifiers[i]['threshold'],
                                         classifiers[i]['inequal'])
         aggregated_class_estimate += classifiers[i]['alpha'] * class_estimate
-        #message = "aggregated_class_estimate: {agg}".\
-            #format(agg=aggregated_class_estimate)
-        #logging.info(message)
     return np.sign(aggregated_class_estimate)
 
 

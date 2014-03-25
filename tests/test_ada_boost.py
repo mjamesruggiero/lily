@@ -93,5 +93,16 @@ class TestAdaBoost(unittest.TestCase):
         ]
         self.assertEqual(classifiers, expected)
 
+    def test_classify(self):
+        """ada_boost - classify build classifications from stumps"""
+        classifiers, estimates =\
+            ada_boost.train_dataset(self.larger_matrix,
+                                    self.larger_class_labels,
+                                    9)
+        data_to_classify = [1, 0.5]
+        classifications = ada_boost.classify(data_to_classify, classifiers)
+        expected = np.mat([-1.])
+        self.assertEqual(classifications, expected)
+
 if __name__ == '__main__':
     unittest.main()
