@@ -12,6 +12,7 @@ logging.basicConfig(level=logging.INFO, format="%(funcName)s\t%(message)s")
 def bisecting_k_means():
     data_matrix = np.mat(utils.load_tsv_into_array('data/test_set_2.txt'))
     centroid_list, assessments = k_means.bisect_k_means(data_matrix, 3)
+    return centroid_list, assessments
 
 
 def main():

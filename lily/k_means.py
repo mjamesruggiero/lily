@@ -1,6 +1,6 @@
 import numpy as np
 import logging
-logging.basicConfig(level=logging.WARN, format="%(funcName)s\t%(message)s")
+logging.basicConfig(level=logging.INFO, format="%(funcName)s\t%(message)s")
 
 
 def euclidean_distance(vec_a, vec_b):
