@@ -3,7 +3,7 @@ import math
 from collections import Counter, defaultdict
 
 FORMAT = "%(lineno)d\t%(message)s"
-logging.basicConfig(level=logging.ERROR, format=FORMAT)
+logging.basicConfig(level=logging.INFO, format=FORMAT)
 
 
 def classify(input_tree, feature_labels, test_vector):
@@ -79,8 +79,8 @@ def choose_best_feature_to_split(data_set):
                          format(value, prob, new_entropy))
 
         information_gain = base_entropy - new_entropy
-        logging.info("--> information gain for {0} is {1}".
-                     format(i, information_gain))
+        logging.info("--> information gain for {0} is {1} and best is {2}".
+                     format(i, information_gain, best_information_gain))
 
         if information_gain > best_information_gain:
             best_information_gain = information_gain
