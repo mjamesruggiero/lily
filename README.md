@@ -11,12 +11,6 @@ Includes
 * logistic regression
 * support vector machines
 
-Will include
-
-* AdaBoost
-
-<img src="http://24.media.tumblr.com/dd537b0d5f17111e5ed82b25b711e1d8/tumblr_mpfh6aoXBz1r1ad7ko1_500.jpg" alt="lily" width="250"/>
-
 ## Examples
 
 ### k-means
@@ -48,3 +42,7 @@ if __name__ == '__main__':
     #bisecting k-means
     centroid_list, assessments = k_means.bisect_k_means(data_matrix, 3)
 ```
+
+## Named after Lily
+
+<img src="http://media.giphy.com/media/21KuU51onRVHG/giphy.gif" alt="lily"/>
